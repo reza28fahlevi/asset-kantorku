@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -43,7 +44,7 @@ class UserController extends Controller
         $data = $this->validated($request, null);
 
         DB::transaction(function () use ($data) {
-            $user = User::create($data);
+            $user = User::create(Arr::except($data, 'roles'));
             $this->syncRoles($user, $data['roles']);
         });
 
@@ -67,7 +68,7 @@ class UserController extends Controller
         }
 
         DB::transaction(function () use ($user, $data) {
-            $user->update($data);
+            $user->update(Arr::except($data, 'roles'));
             $this->syncRoles($user, $data['roles']);
         });
 

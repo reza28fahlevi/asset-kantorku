@@ -6,6 +6,7 @@ use App\Models\ApprovalRequest;
 use App\Models\ApprovalStep;
 use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**

@@ -56,7 +56,8 @@
         @php
             $rolePermissions = $roles->mapWithKeys(fn ($r) => [$r->id => $r->permissions->map(fn ($p) => ['id' => $p->id, 'label' => $p->display_name ?: $p->name, 'group' => $p->group_name ?: 'Umum'])->values()]);
         @endphp
-        <x-card title="Role Akses (Multi Role)" icon="shield_person" x-data="rolePicker(@js($selectedRoles), @js($rolePermissions))">
+        <x-card title="Role Akses (Multi Role)" icon="shield_person">
+            <div x-data="rolePicker(@js($selectedRoles), @js($rolePermissions))">
             <p class="text-body-sm text-on-surface-variant mb-space-md">Pilih satu atau lebih role. Hak akses user adalah gabungan dari seluruh role yang dipilih.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
                 @foreach ($roles as $r)
@@ -93,6 +94,7 @@
             </div>
             @error('roles')<p class="form-error">{{ $message }}</p>@enderror
             @error('roles.*')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
         </x-card>
     </div>
 

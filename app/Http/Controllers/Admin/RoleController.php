@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -31,7 +32,7 @@ class RoleController extends Controller
         $data = $this->validated($request, null);
 
         DB::transaction(function () use ($data) {
-            $role = Role::create($data);
+            $role = Role::create(Arr::except($data, 'permissions'));
             $this->syncPermissions($role, $data['permissions'] ?? []);
         });
 
@@ -51,7 +52,7 @@ class RoleController extends Controller
         }
 
         DB::transaction(function () use ($role, $data) {
-            $role->update($data);
+            $role->update(Arr::except($data, 'permissions'));
             $this->syncPermissions($role, $data['permissions'] ?? []);
         });
 
