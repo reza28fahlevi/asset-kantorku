@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"border-strong":"#CBD5E1","on-tertiary":"#ffffff","surface-variant":"#d3e4fe","surface-container":"#e5eeff","surface-container-low":"#eff4ff","surface-bright":"#f8f9ff","surface-canvas":"#F8FAFC","surface-container-lowest":"#ffffff","primary-fixed":"#dae2fd","on-surface":"#0b1c30","status-neutral":"#475569","on-error":"#ffffff","tertiary":"#000000","on-secondary-fixed":"#2f1500","surface-container-high":"#dce9ff","status-assigned":"#2563EB","secondary":"#904d00","border-subtle":"#E2E8F0","on-tertiary-fixed-variant":"#3a485c","on-tertiary-fixed":"#0d1c2f","on-error-container":"#93000a","secondary-fixed":"#ffdcc3","error":"#ba1a1a","on-primary-container":"#7c839b","on-primary":"#ffffff","inverse-surface":"#213145","tertiary-fixed":"#d5e3fd","status-available":"#059669","on-secondary-fixed-variant":"#6e3900","outline":"#76777d","status-repair":"#EA580C","on-background":"#0b1c30","inverse-primary":"#bec6e0","inverse-on-surface":"#eaf1ff","secondary-container":"#fe932c","on-secondary-container":"#663500","status-loan":"#7C3AED","on-primary-fixed":"#131b2e","tertiary-fixed-dim":"#b9c7e0","surface-card":"#FFFFFF","primary-container":"#131b2e","secondary-fixed-dim":"#ffb77d","surface":"#f8f9ff","surface-dim":"#cbdbf5","on-primary-fixed-variant":"#3f465c","error-container":"#ffdad6","surface-subtle":"#F1F5F9","on-surface-variant":"#45464d","tertiary-container":"#0d1c2f","surface-tint":"#565e74","surface-container-highest":"#d3e4fe","on-secondary":"#ffffff","on-tertiary-container":"#76859b","primary-fixed-dim":"#bec6e0","outline-variant":"#c6c6cd","primary":"#000000","background":"#f8f9ff","status-disposal":"#DC2626"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"gutter":"1.5rem","space-xl":"2rem","space-sm":"0.5rem","margin":"2rem","margin-mobile":"1rem","space-md":"0.75rem","space-lg":"1.25rem","gutter-mobile":"0.75rem","space-xs":"0.25rem"},"fontFamily":{"body-md":["Inter"],"body-sm":["Inter"],"code-sm":["JetBrains Mono"],"display-md":["Inter"],"label-sm":["Inter"],"headline-sm":["Inter"],"title-md":["Inter"],"body-lg":["Inter"],"display-lg":["Inter"],"label-md":["Inter"]},"fontSize":{"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"code-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"display-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"600"}],"headline-sm":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface-canvas font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-64 bg-primary-container z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.08)]"><div class="h-16 px-space-md flex items-center gap-space-sm bg-tertiary-container shadow-[0_1px_4px_rgba(0,0,0,0.12)]"><img alt="AssetPro Enterprise Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UfCYOkJc5wKVKqW7Iw0ZsTTOkQG-tBe5CNm2s1sMpKwVUvI-19vdsr9JS_A5CXriu6cNbhmpjPi83L90L4o9c-FsD6m_-Aqagem2fNlliHt3vT1QEESu158wg5R7XOot-c3u6Ab1MvYP3olooZCNeyH31UlwMf3KR5DvjkgDWL6nVlM_iTGebpbpQZksP9ioZ39RE8zmhkV_PT7AWv9PGb9KeV0BMMCy3adlZSR_cUDtQFgvibdg_-UW4"/><div class="flex flex-col"><span class="font-title-md text-title-md text-on-primary font-bold tracking-tight leading-tight">AssetPro</span><span class="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider">Enterprise</span></div></div><div class="p-space-md mx-space-sm my-space-sm rounded-lg bg-inverse-surface/40 flex items-center gap-space-md"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-secondary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKbhE8ATW8tJCkjiZCT1FfhynOfHH1TfEy21O3VIbpTq8Fu3rxyfryFZ3wgNoiquBwzXTu1P4ipex9MLmlQEAg1U3r4aM26iKhpy1NvE4tULHpbu1eii5Nl0YFfHhhz9cp5Z7a9gAGNwOZJggiJMqWW8dB7CgyMJFJJlOYP18jsIu-q9bf4GQDQq1HJA1gnbyIUK49R4UNaDyAKsnkzwRvLpvMsAxcgCoxrF8C6gEQ0vZUQBQBr5Nabw"/><div class="flex flex-col min-w-0 flex-1"><span class="font-label-md text-label-md text-on-primary font-semibold truncate">Bambang Pratama</span><span class="font-label-sm text-label-sm text-secondary-container uppercase tracking-tight">Asset Administrator</span></div></div><div class="flex-1 overflow-y-auto px-space-xs py-space-sm space-y-space-md"><div class="px-space-md"><span class="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider block">Main Menu</span></div><nav class="space-y-1" data-active-classes="bg-inverse-surface text-on-primary font-semibold"><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="dashboard" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">dashboard</span><span class="font-body-sm text-body-sm">Dashboard</span></div></a><a aria-current="page" class="flex items-center justify-between px-space-md py-space-sm rounded transition-colors bg-inverse-surface text-on-primary font-semibold" data-path="asset-register" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">inventory_2</span><span class="font-body-sm text-body-sm">Asset Register</span></div></a></nav><div class="px-space-md pt-space-xs"><span class="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider block">Transaksi &amp; Alur</span></div><nav class="space-y-1" data-active-classes="bg-inverse-surface text-on-primary font-semibold"><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="approval-inbox" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">mark_email_unread</span><span class="font-body-sm text-body-sm">Approval Inbox</span></div><span class="bg-error text-on-error font-label-sm text-label-sm px-space-xs py-0.5 rounded-full">5</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="procurement-requests" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span><span class="font-body-sm text-body-sm">Procurement</span></div></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="assignment-handover" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">assignment_ind</span><span class="font-body-sm text-body-sm">Handover</span></div></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="asset-loans" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">swap_horiz</span><span class="font-body-sm text-body-sm">Asset Loans</span></div></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="disposal" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">delete_forever</span><span class="font-body-sm text-body-sm">Disposal</span></div></a></nav><div class="px-space-md pt-space-xs"><span class="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider block">Master &amp; Pengaturan</span></div><nav class="space-y-1" data-active-classes="bg-inverse-surface text-on-primary font-semibold"><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="master-karyawan" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">badge</span><span class="font-body-sm text-body-sm">Master Karyawan</span></div></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="kategori-lokasi" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">category</span><span class="font-body-sm text-body-sm">Kategori &amp; Lokasi</span></div></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors" data-path="audit-log-reports" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">receipt_long</span><span class="font-body-sm text-body-sm">Audit &amp; Reports</span></div></a></nav></div><div class="p-space-md bg-tertiary-container text-center"><span class="font-label-sm text-label-sm text-on-tertiary-container block">v2.4 Enterprise Edition</span></div></aside><div class="pl-64 flex flex-col min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-card/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter"><div class="flex items-center gap-space-md"><button class="p-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" type="button"><span class="material-symbols-outlined">menu</span></button><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-space-md text-outline text-[18px]">search</span><input class="w-80 h-9 pl-9 pr-16 bg-surface-subtle rounded text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="Cari aset, tag RFID, barcode, serial number..." type="text"/><div class="absolute right-space-sm flex items-center gap-0.5 px-space-xs py-0.5 rounded bg-surface-card text-outline font-code-sm text-code-sm shadow-[0_1px_2px_rgba(0,0,0,0.05)]"><span>Ctrl</span><span>+</span><span>K</span></div></div></div><div class="flex items-center gap-space-md"><div class="relative"><button class="relative p-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-error ring-2 ring-surface-card"></span></button></div><button class="hidden sm:flex items-center gap-space-xs px-space-md py-space-xs bg-surface-subtle hover:bg-surface-container rounded transition-colors text-on-surface-variant hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[18px] text-secondary">pending_actions</span><span class="font-label-md text-label-md">Tugas Approval</span><span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-1.5 py-0.5 rounded-full font-bold">3</span></button><div class="flex items-center gap-space-sm pl-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKbhE8ATW8tJCkjiZCT1FfhynOfHH1TfEy21O3VIbpTq8Fu3rxyfryFZ3wgNoiquBwzXTu1P4ipex9MLmlQEAg1U3r4aM26iKhpy1NvE4tULHpbu1eii5Nl0YFfHhhz9cp5Z7a9gAGNwOZJggiJMqWW8dB7CgyMJFJJlOYP18jsIu-q9bf4GQDQq1HJA1gnbyIUK49R4UNaDyAKsnkzwRvLpvMsAxcgCoxrF8C6gEQ0vZUQBQBr5Nabw"/><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Bambang Pratama</span><span class="font-label-sm text-label-sm text-status-available flex items-center gap-1 leading-tight"><span class="w-1.5 h-1.5 rounded-full bg-status-available"></span>Online</span></div><span class="material-symbols-outlined text-outline text-[18px]">expand_more</span></div></div></header><div class="pt-16 bg-surface-canvas"><div class="w-full px-gutter py-space-md bg-surface-card shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-wrap items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><a class="font-label-md text-label-md text-outline hover:text-on-surface flex items-center gap-1" href="#"><span class="material-symbols-outlined text-[16px]">home</span> Beranda</a><span class="material-symbols-outlined text-outline text-[14px]">chevron_right</span><span class="font-label-md text-label-md text-on-surface font-semibold">Asset Governance &amp; Operations</span></div><div class="flex items-center gap-space-sm"><button class="h-9 px-space-md bg-surface-card border border-border-strong hover:bg-surface-subtle text-on-surface font-label-md text-label-md rounded flex items-center gap-space-xs shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors" type="button"><span class="material-symbols-outlined text-[18px] text-secondary">add_circle</span><span>+ Ajukan Pengadaan</span></button><button class="h-9 px-space-md bg-primary-container hover:bg-inverse-surface text-on-primary font-label-md text-label-md rounded flex items-center gap-space-xs shadow-[0_1px_3px_rgba(15,23,42,0.12)] transition-colors" type="button"><span class="material-symbols-outlined text-[18px] text-secondary-container">inventory</span><span>+ Daftarkan Aset</span></button></div></div></div><main class="relative w-full px-gutter py-space-lg bg-surface-canvas flex-1"><div class="flex flex-col w-full">
+<!-- Top Command & Breadcrumb Contextual Subheader -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md mb-space-lg">
+<div class="flex flex-col gap-0.5">
+<div class="flex items-center gap-space-xs text-status-neutral font-label-sm uppercase tracking-wider">
+<span>Aset &amp; Inventaris</span>
+<span class="material-symbols-outlined text-[13px]">chevron_right</span>
+<span class="text-secondary font-semibold">Katalog Master Aset</span>
+</div>
+<div class="flex items-baseline gap-space-md">
+<h1 class="font-display-md text-display-md text-on-surface font-bold tracking-tight">Katalog Master Aset</h1>
+<span class="font-code-sm text-code-sm text-status-neutral bg-surface-subtle px-2 py-0.5 rounded shadow-sm">ISO-55001 Compliant</span>
+</div>
+</div>
+<!-- Quick Action Toolbelt -->
+<div class="flex items-center gap-space-sm flex-wrap">
+<!-- Bulk Export Options -->
+<div class="inline-flex rounded shadow-sm bg-surface-card p-0.5">
+<button class="px-space-md py-1.5 font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle rounded transition-colors flex items-center gap-1.5" onclick="exportData('xlsx')" type="button">
+<span class="material-symbols-outlined text-[16px] text-status-available">table_view</span>
+<span>Excel</span>
+</button>
+<button class="px-space-md py-1.5 font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle rounded transition-colors flex items-center gap-1.5" onclick="exportData('pdf')" type="button">
+<span class="material-symbols-outlined text-[16px] text-error">picture_as_pdf</span>
+<span>PDF Audit</span>
+</button>
+</div>
+<button class="h-9 px-space-md bg-surface-card border border-border-strong hover:bg-surface-subtle text-on-surface font-label-md text-label-md rounded flex items-center gap-1.5 shadow-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">qr_code_scanner</span>
+<span>Batch Barcode / QR</span>
+</button>
+<button class="h-9 px-space-md bg-primary-container text-on-primary hover:bg-inverse-surface font-label-md text-label-md rounded flex items-center gap-2 shadow transition-all" type="button">
+<span class="material-symbols-outlined text-secondary-container text-[18px]">add_box</span>
+<span>+ Registrasi Aset Baru</span>
+</button>
+</div>
+</div>
+<!-- KPI Metrik Real-Time Ringkasan -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-space-md mb-space-lg">
+<div class="bg-surface-card p-space-md rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-status-neutral mb-1">
+<span class="font-label-sm uppercase tracking-wide">Total Terdata</span>
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-display-md text-display-md text-on-surface font-bold">1,248</span>
+<span class="font-label-sm text-status-available flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>+12 bln ini
+        </span>
+</div>
+</div>
+<div class="bg-surface-card p-space-md rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-status-available mb-1">
+<span class="font-label-sm uppercase tracking-wide">Siap Pakai</span>
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-display-md text-display-md text-status-available font-bold">230</span>
+<span class="font-code-sm text-code-sm text-status-neutral">18.4% rasio</span>
+</div>
+</div>
+<div class="bg-surface-card p-space-md rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-status-assigned mb-1">
+<span class="font-label-sm uppercase tracking-wide">Ditugaskan (Aktif)</span>
+<span class="material-symbols-outlined text-[18px]">person_pin</span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-display-md text-display-md text-on-surface font-bold">890</span>
+<span class="font-code-sm text-code-sm text-status-assigned">71.3% utilisasi</span>
+</div>
+</div>
+<div class="bg-surface-card p-space-md rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-status-loan mb-1">
+<span class="font-label-sm uppercase tracking-wide">Peminjaman Sementara</span>
+<span class="material-symbols-outlined text-[18px]">pending_actions</span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-display-md text-display-md text-on-surface font-bold">128</span>
+<span class="font-label-sm text-error flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">warning</span>4 due soon
+        </span>
+</div>
+</div>
+<div class="bg-surface-card p-space-md rounded-lg shadow-sm flex flex-col justify-between col-span-2 md:col-span-1">
+<div class="flex items-center justify-between text-status-repair mb-1">
+<span class="font-label-sm uppercase tracking-wide">Maintenance / RMA</span>
+<span class="material-symbols-outlined text-[18px]">build_circle</span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-display-md text-display-md text-status-repair font-bold">15</span>
+<span class="font-code-sm text-code-sm text-status-neutral">SLA: 4.2 hari</span>
+</div>
+</div>
+</div>
+<!-- Main Content Layout: Data Grid + Side Detail Drawer -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- Left / Primary Master Asset Table Workspace (8 cols on large screens, expandable) -->
+<div class="xl:col-span-8 flex flex-col gap-space-md">
+<!-- Tab Filter Navigation -->
+<div class="bg-surface-card rounded-lg shadow-sm p-1.5 flex items-center justify-between flex-wrap gap-2">
+<div class="flex items-center gap-1 overflow-x-auto" id="asset-tab-container">
+<button class="asset-tab active-tab px-space-md py-1.5 rounded font-label-md text-label-md font-semibold transition-all bg-primary-container text-on-primary shadow-sm flex items-center gap-1.5" onclick="filterTab('ALL')" type="button">
+<span>Semua Aset</span>
+<span class="bg-inverse-surface text-on-primary-container font-code-sm text-[11px] px-1.5 py-0.2 rounded-full">1,248</span>
+</button>
+<button class="asset-tab px-space-md py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-all flex items-center gap-1.5" onclick="filterTab('AVAILABLE')" type="button">
+<span>Tersedia</span>
+<span class="bg-surface-container font-code-sm text-[11px] px-1.5 py-0.2 rounded-full text-status-available font-semibold">230</span>
+</button>
+<button class="asset-tab px-space-md py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-all flex items-center gap-1.5" onclick="filterTab('ASSIGNED')" type="button">
+<span>Ditugaskan</span>
+<span class="bg-surface-container font-code-sm text-[11px] px-1.5 py-0.2 rounded-full text-status-assigned font-semibold">890</span>
+</button>
+<button class="asset-tab px-space-md py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-all flex items-center gap-1.5" onclick="filterTab('ON_LOAN')" type="button">
+<span>Dipinjam</span>
+<span class="bg-surface-container font-code-sm text-[11px] px-1.5 py-0.2 rounded-full text-status-loan font-semibold">128</span>
+</button>
+<button class="asset-tab px-space-md py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-all flex items-center gap-1.5" onclick="filterTab('IN_REPAIR')" type="button">
+<span>Dalam Perbaikan</span>
+<span class="bg-surface-container font-code-sm text-[11px] px-1.5 py-0.2 rounded-full text-status-repair font-semibold">15</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-outline">
+<span class="font-code-sm text-code-sm text-status-neutral hidden sm:inline">Audit Sync: 10:42 WIB</span>
+<button class="p-1 rounded hover:bg-surface-subtle text-on-surface-variant" title="Refresh Table" type="button">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+</button>
+</div>
+</div>
+<!-- Comprehensive Filter & Search Bar Toolbar -->
+<div class="bg-surface-card rounded-lg shadow-sm p-space-md">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-sm items-center">
+<!-- Unified Search Input -->
+<div class="md:col-span-5 relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">search</span>
+<input class="w-full h-[38px] pl-9 pr-8 bg-surface-subtle rounded text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:bg-surface-card shadow-sm transition-all" id="filter-search-input" placeholder="Cari tag aset, serial number, tipe aset..." type="text"/>
+<button class="absolute right-2.5 top-2.5 text-outline hover:text-on-surface" onclick="document.getElementById('filter-search-input').value=''" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Kategori Dropdown -->
+<div class="md:col-span-2">
+<div class="relative">
+<select class="w-full h-[38px] pl-2.5 pr-7 bg-surface-subtle rounded text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:bg-surface-card cursor-pointer shadow-sm">
+<option value="">Semua Kategori</option>
+<option value="IT">IT Hardware &amp; Laptop</option>
+<option value="VEHICLE">Kendaraan Dinas</option>
+<option value="FURNITURE">Office Furniture</option>
+<option value="MACHINERY">Mesin &amp; Fasilitas</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 pointer-events-none text-outline text-[18px]">expand_more</span>
+</div>
+</div>
+<!-- Departemen Dropdown -->
+<div class="md:col-span-2">
+<div class="relative">
+<select class="w-full h-[38px] pl-2.5 pr-7 bg-surface-subtle rounded text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:bg-surface-card cursor-pointer shadow-sm">
+<option value="">Semua Dept</option>
+<option value="ENG">Engineering</option>
+<option value="FIN">Finance &amp; Tax</option>
+<option value="HR">People &amp; Culture</option>
+<option value="OPS">Operations</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 pointer-events-none text-outline text-[18px]">expand_more</span>
+</div>
+</div>
+<!-- Lokasi Dropdown -->
+<div class="md:col-span-2">
+<div class="relative">
+<select class="w-full h-[38px] pl-2.5 pr-7 bg-surface-subtle rounded text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:bg-surface-card cursor-pointer shadow-sm">
+<option value="">Semua Lokasi</option>
+<option value="HQ-L4">HQ Jakarta (Lt. 4)</option>
+<option value="HQ-L7">HQ Jakarta (Lt. 7)</option>
+<option value="SUB">Branch Surabaya</option>
+<option value="BDG">Branch Bandung</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 pointer-events-none text-outline text-[18px]">expand_more</span>
+</div>
+</div>
+<!-- Clear Filter Reset Button -->
+<div class="md:col-span-1 flex justify-end">
+<button class="h-[38px] w-full flex items-center justify-center bg-surface-subtle hover:bg-surface-container text-on-surface-variant hover:text-on-surface rounded shadow-sm transition-colors" title="Reset Filter" type="button">
+<span class="material-symbols-outlined text-[18px]">filter_alt_off</span>
+</button>
+</div>
+</div>
+<!-- Secondary active filter tags -->
+<div class="flex items-center gap-space-xs mt-space-sm pt-space-xs flex-wrap">
+<span class="font-label-sm text-label-sm text-status-neutral">Filter Aktif:</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-subtle text-on-surface font-label-sm text-label-sm">
+            Status: <b class="font-semibold text-secondary">Semua Aset</b>
+</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-subtle text-on-surface font-label-sm text-label-sm">
+            Kondisi: Baik (Grade A)
+            <button class="hover:text-error" type="button"><span class="material-symbols-outlined text-[14px]">cancel</span></button>
+</span>
+<button class="text-secondary font-label-sm text-label-sm underline ml-2" type="button">Reset semua</button>
+</div>
+</div>
+<!-- Master Responsive Table Container -->
+<div class="bg-surface-card rounded-lg shadow-sm overflow-hidden flex flex-col">
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left text-on-surface font-body-sm text-body-sm">
+<thead class="bg-surface-canvas text-status-neutral font-label-md text-label-md uppercase tracking-wider h-10 border-b border-border-subtle">
+<tr>
+<th class="w-10 px-space-md py-2 text-center" scope="col">
+<input class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer accent-primary" type="checkbox"/>
+</th>
+<th class="px-space-md py-2" scope="col">Tag &amp; Barcode</th>
+<th class="px-space-sm py-2" scope="col">Item / Spesifikasi</th>
+<th class="px-space-md py-2" scope="col">Serial Number</th>
+<th class="px-space-md py-2" scope="col">Pemegang / Karyawan</th>
+<th class="px-space-md py-2" scope="col">Lokasi &amp; Dept</th>
+<th class="px-space-md py-2" scope="col">Status</th>
+<th class="w-16 px-space-md py-2 text-right" scope="col">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle" id="asset-table-body">
+<!-- Row 1: Selected / Featured (Dell XPS 15) -->
+<tr class="hover:bg-surface-subtle/80 bg-surface-container-low/40 cursor-pointer transition-colors" onclick="selectAsset('AST-IT-2024-0129')">
+<td class="px-space-md py-3 text-center" onclick="event.stopPropagation()">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer accent-primary" type="checkbox"/>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface text-secondary">AST-IT-2024-0129</span>
+<span class="text-status-neutral text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">qr_code_2</span>RFID-99420-TX
+                    </span>
+</div>
+</td>
+<td class="px-space-sm py-3">
+<div class="flex items-center gap-space-sm">
+<img class="w-10 h-10 rounded object-cover shadow-sm bg-surface-subtle flex-shrink-0" data-alt="High-performance ultra-slim executive silver laptop Dell XPS 15 open on clean architectural desk with soft ambient studio lighting, precision industrial aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPTkwAd1bq-ev4J_SfVTno9pfrZjaTBgSPYL0EEkfqsYGDoyRJp1CdMUDKg5EBk3VNHnKTZzfjEkWL42jKahyWyq8PRpeUPAY3MjeHvIrCAw1a9lIYQSgiUyhQUtgHHCY2taVSJY8nshsmrrpulzJFyM_E0Ev009o4aU2LogYU52gMu4wV5Vud6QtOG8QepwAwTxC8qNEKrlgmHnGgDR2gB4DNB5R9dAu2UpIfjWA97-TkuJ2CCH564Q"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface truncate">Dell XPS 15 9530</span>
+<span class="text-outline text-label-sm truncate">Intel Core i7-13700H • 32GB • 1TB NVMe</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm text-status-neutral">
+                  SN-DL-8839210-JK
+                </td>
+<td class="px-space-md py-3">
+<div class="flex items-center gap-2">
+<img alt="Bambang" class="w-7 h-7 rounded-full object-cover ring-1 ring-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKbhE8ATW8tJCkjiZCT1FfhynOfHH1TfEy21O3VIbpTq8Fu3rxyfryFZ3wgNoiquBwzXTu1P4ipex9MLmlQEAg1U3r4aM26iKhpy1NvE4tULHpbu1eii5Nl0YFfHhhz9cp5Z7a9gAGNwOZJggiJMqWW8dB7CgyMJFJJlOYP18jsIu-q9bf4GQDQq1HJA1gnbyIUK49R4UNaDyAKsnkzwRvLpvMsAxcgCoxrF8C6gEQ0vZUQBQBr5Nabw"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Bambang Pratama</span>
+<span class="font-code-sm text-[11px] text-status-neutral">EMP-00194</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">HQ Jakarta • Lt. 4</span>
+<span class="text-status-neutral font-label-sm text-label-sm">IT Architecture</span>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-status-assigned border border-surface-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-status-assigned mr-1.5"></span>ASSIGNED
+                  </span>
+</td>
+<td class="px-space-md py-3 text-right" onclick="event.stopPropagation()">
+<div class="relative inline-block text-left">
+<button class="p-1 text-outline hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" onclick="toggleRowDropdown(event, 'drop-1')" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+<div class="hidden absolute right-0 mt-1 w-44 bg-surface-card rounded shadow-xl py-1 z-30 font-label-md text-label-md text-on-surface" id="drop-1">
+<a class="flex items-center gap-2 px-3 py-1.5 hover:bg-surface-subtle" href="#"><span class="material-symbols-outlined text-[16px] text-secondary">visibility</span>Detail Aset</a>
+<a class="flex items-center gap-2 px-3 py-1.5 hover:bg-surface-subtle" href="#"><span class="material-symbols-outlined text-[16px]">assignment_ind</span>Serah Terima Baru</a>
+<a class="flex items-center gap-2 px-3 py-1.5 hover:bg-surface-subtle" href="#"><span class="material-symbols-outlined text-[16px]">swap_horiz</span>Peminjaman</a>
+<div class="my-1 border-t border-border-subtle"></div>
+<a class="flex items-center gap-2 px-3 py-1.5 hover:bg-surface-subtle text-error" href="#"><span class="material-symbols-outlined text-[16px]">delete_forever</span>Ajukan Disposal</a>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2: Apple MacBook Pro (Assigned) -->
+<tr class="hover:bg-surface-subtle/80 cursor-pointer transition-colors" onclick="selectAsset('AST-IT-2024-0082')">
+<td class="px-space-md py-3 text-center" onclick="event.stopPropagation()">
+<input class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer accent-primary" type="checkbox"/>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">AST-IT-2024-0082</span>
+<span class="text-status-neutral text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">qr_code_2</span>RFID-88124-AP
+                    </span>
+</div>
+</td>
+<td class="px-space-sm py-3">
+<div class="flex items-center gap-space-sm">
+<img class="w-10 h-10 rounded object-cover shadow-sm bg-surface-subtle flex-shrink-0" data-alt="Space gray Apple MacBook Pro laptop positioned angled on minimal slate office surface with subtle metallic reflection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP1qpRP0SthHH4sZabFBM1JKqsg1dvghqCTiL5eKC6suJ_bAuFkWD0efYBu3KgGpN-vJgQMuaBjTxM6_-ElTwtu2fQKN-dIIVD2UHlXUL9LVzFNDsSl8sb7fSMY-bSQwyUczqxnyciWplYMuYCxt2yYTjyPXLq3OwAZvWotQgVrt35OHKxoWn4pGRZSvoRcOH-nqjh67tjDs4m5TrXJIPFlugsx7RSpNZ77qm-0VkzYqlnuqtzru-kNA"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface truncate">MacBook Pro 16" M3 Pro</span>
+<span class="text-outline text-label-sm truncate">36GB Unified RAM • 512GB SSD Space Black</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm text-status-neutral">
+                  C02G90K7MD6R
+                </td>
+<td class="px-space-md py-3">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center font-bold text-secondary text-[11px]">
+                      DR
+                    </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Dinda Rahmawati</span>
+<span class="font-code-sm text-[11px] text-status-neutral">EMP-00318</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">HQ Jakarta • Lt. 7</span>
+<span class="text-status-neutral font-label-sm text-label-sm">Product &amp; UI/UX</span>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-status-assigned border border-surface-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-status-assigned mr-1.5"></span>ASSIGNED
+                  </span>
+</td>
+<td class="px-space-md py-3 text-right" onclick="event.stopPropagation()">
+<button class="p-1 text-outline hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Available Workstation (Tersedia) -->
+<tr class="hover:bg-surface-subtle/80 cursor-pointer transition-colors" onclick="selectAsset('AST-IT-2024-0341')">
+<td class="px-space-md py-3 text-center" onclick="event.stopPropagation()">
+<input class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer accent-primary" type="checkbox"/>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">AST-IT-2024-0341</span>
+<span class="text-status-neutral text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">qr_code_2</span>RFID-33109-TH
+                    </span>
+</div>
+</td>
+<td class="px-space-sm py-3">
+<div class="flex items-center gap-space-sm">
+<img class="w-10 h-10 rounded object-cover shadow-sm bg-surface-subtle flex-shrink-0" data-alt="Lenovo ThinkPad executive workstation business notebook computer resting on wooden desk with professional accessories" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaupBc0I0I9Y4pKxcdZqH4cxXSy2KN1cyJ8f8wDH-0SGT-DxFaIaa8fJru_2-wBzebzamPA_HC03zSmhuTcxwTI5GeDZ1JolxYOhnRxN3KAAAOUcLL5FL30N6iN2-WhZucfY7-tnD7V_49weuIGK1Bb73gjli9G1gAX4acMXcPV_-L2j6nDMLbA29x48leTjxK7ThOUzqfQCNjZUelr3-PvPtSutUIgfufuHxrx836ELUd--yQ4RR5bQ"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface truncate">ThinkPad T14s Gen 4</span>
+<span class="text-outline text-label-sm truncate">AMD Ryzen 7 PRO • 16GB • 512GB SSD</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm text-status-neutral">
+                  PF-49129-LNV
+                </td>
+<td class="px-space-md py-3">
+<span class="font-code-sm text-status-available italic flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">warehouse</span>Pool IT Stock
+                  </span>
+</td>
+<td class="px-space-md py-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Warehouse Lt. 1</span>
+<span class="text-status-neutral font-label-sm text-label-sm">IT Operations</span>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-emerald-50 text-status-available border border-emerald-200 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-status-available mr-1.5"></span>AVAILABLE
+                  </span>
+</td>
+<td class="px-space-md py-3 text-right" onclick="event.stopPropagation()">
+<button class="p-1 text-outline hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Toyota Innova Zenix (Kendaraan - ON_LOAN) -->
+<tr class="hover:bg-surface-subtle/80 cursor-pointer transition-colors" onclick="selectAsset('AST-VH-2023-0014')">
+<td class="px-space-md py-3 text-center" onclick="event.stopPropagation()">
+<input class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer accent-primary" type="checkbox"/>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">AST-VH-2023-0014</span>
+<span class="text-status-neutral text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">directions_car</span>B-1942-SZA
+                    </span>
+</div>
+</td>
+<td class="px-space-sm py-3">
+<div class="flex items-center gap-space-sm">
+<img class="w-10 h-10 rounded object-cover shadow-sm bg-surface-subtle flex-shrink-0" data-alt="Modern black Toyota Innova Zenix hybrid corporate company vehicle parked in front of sleek corporate glass building" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDggxDZvjs2c0JrFBKoQrJI-EywQXgxRbQ9JqIqj6vA6uTIpN85CyUUJVfCowIZT6gpTo7L2kl4wbNDkBdE98bmORtX4pV6_nczhb2AlWO71IXwP6OUxPeHR81vdkFLtYa1EYBG_tDK7FsSlcNHTI7VGDU7SuhKcdA_O3vSgVYnpkoUupIpa-7JwfWMgDEyDH5a7Od0YN0Yw0Du_hZ-cn0yJTX_XwZVjYs1m4KN9gvanbxGtKwBkVckgQ"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface truncate">Toyota Innova Zenix 2.0 V</span>
+<span class="text-outline text-label-sm truncate">Kendaraan Operasional • Fleet Pool #3</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm text-status-neutral">
+                  MH-2ZNX-982141
+                </td>
+<td class="px-space-md py-3">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center font-bold text-status-loan text-[11px]">
+                      HW
+                    </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Hendra Wijaya</span>
+<span class="font-code-sm text-[11px] text-error flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">alarm</span>Due: Besok 17:00
+                      </span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Branch Surabaya</span>
+<span class="text-status-neutral font-label-sm text-label-sm">Corporate Sales</span>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-purple-50 text-status-loan border border-purple-200 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-status-loan mr-1.5"></span>ON_LOAN
+                  </span>
+</td>
+<td class="px-space-md py-3 text-right" onclick="event.stopPropagation()">
+<button class="p-1 text-outline hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: Projector 4K Conference (IN_REPAIR) -->
+<tr class="hover:bg-surface-subtle/80 cursor-pointer transition-colors" onclick="selectAsset('AST-AV-2022-0911')">
+<td class="px-space-md py-3 text-center" onclick="event.stopPropagation()">
+<input class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer accent-primary" type="checkbox"/>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">AST-AV-2022-0911</span>
+<span class="text-status-neutral text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">qr_code_2</span>RFID-10029-EP
+                    </span>
+</div>
+</td>
+<td class="px-space-sm py-3">
+<div class="flex items-center gap-space-sm">
+<img class="w-10 h-10 rounded object-cover shadow-sm bg-surface-subtle flex-shrink-0" data-alt="High end business conference room projector mounted on ceiling with pristine boardroom setup in modern office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvIhOXW_Vp3bv8y6OlOojC0A_ECoWb6Egz1U-lEs-V2KAKhi3UI0fOfXroznFSB73MAi7NHe6oa1IAt3HeWqvBN_EN6DL7HwuqTDsnqcW6FbQG9yinM7CXjcYHeAZa8Q-ZtxxBRhaxAN9FGnGd9zAGgYZtcpY20ivNOvchi8OcTpzak4njHrn_NZCGHRJwmWGRMEaJ_KYFVch8FOa-4PUbM_GSBCtqG_DzjwNV7FRod1GyL78IbjxxYA"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface truncate">Epson Laser Projector 4K</span>
+<span class="text-outline text-label-sm truncate">EB-L730U • Boardroom Utama</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm text-status-neutral">
+                  EP-L730U-209931
+                </td>
+<td class="px-space-md py-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-status-repair font-semibold">Vendor PT Datascript</span>
+<span class="font-code-sm text-[11px] text-status-neutral">Tiket Servis #RMA-849</span>
+</div>
+</td>
+<td class="px-space-md py-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">HQ Jakarta • Lt. 4</span>
+<span class="text-status-neutral font-label-sm text-label-sm">General Affairs</span>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-orange-50 text-status-repair border border-orange-200 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-status-repair mr-1.5"></span>IN_REPAIR
+                  </span>
+</td>
+<td class="px-space-md py-3 text-right" onclick="event.stopPropagation()">
+<button class="p-1 text-outline hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 6: Obsolete Server Rack (PENDING_DISPOSAL) -->
+<tr class="hover:bg-surface-subtle/80 cursor-pointer transition-colors" onclick="selectAsset('AST-SRV-2018-0044')">
+<td class="px-space-md py-3 text-center" onclick="event.stopPropagation()">
+<input class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer accent-primary" type="checkbox"/>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">AST-SRV-2018-0044</span>
+<span class="text-status-neutral text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">qr_code_2</span>RFID-00411-HP
+                    </span>
+</div>
+</td>
+<td class="px-space-sm py-3">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-status-neutral flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">dns</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-on-surface truncate line-through text-outline">HPE ProLiant DL380 Gen9</span>
+<span class="text-outline text-label-sm truncate">Depresiasi 100% • Usang / Rusak Mainboard</span>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-sm text-code-sm text-status-neutral">
+                  SGH6200XYZ
+                </td>
+<td class="px-space-md py-3">
+<span class="font-code-sm text-error flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[14px]">lock</span>Terkunci Disposal
+                  </span>
+</td>
+<td class="px-space-md py-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Server Room Lt. 2</span>
+<span class="text-status-neutral font-label-sm text-label-sm">Infrastructure</span>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-red-50 text-status-disposal border border-red-200 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-status-disposal mr-1.5"></span>PENDING_DISPOSAL
+                  </span>
+</td>
+<td class="px-space-md py-3 text-right" onclick="event.stopPropagation()">
+<button class="p-1 text-outline hover:text-on-surface hover:bg-surface-subtle rounded transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination & Entry Summary Bar -->
+<div class="px-space-md py-space-sm bg-surface-canvas flex flex-col sm:flex-row items-center justify-between gap-space-sm border-t border-border-subtle">
+<div class="flex items-center gap-space-sm text-status-neutral font-body-sm text-body-sm">
+<span>Menampilkan <b>1 - 10</b> dari <b>1,248</b> aset terdaftar</span>
+<span class="text-border-strong">|</span>
+<div class="flex items-center gap-1">
+<span>Baris per halaman:</span>
+<select class="h-7 bg-surface-card rounded px-1.5 text-on-surface font-code-sm text-code-sm border border-border-subtle focus:outline-none">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+<option>100</option>
+</select>
+</div>
+</div>
+<div class="inline-flex items-center gap-1 font-label-md text-label-md">
+<button class="h-8 w-8 rounded flex items-center justify-center text-status-neutral hover:bg-surface-subtle disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
+</button>
+<button class="h-8 w-8 rounded flex items-center justify-center text-status-neutral hover:bg-surface-subtle disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="h-8 w-8 rounded bg-primary-container text-on-primary font-bold shadow-sm" type="button">1</button>
+<button class="h-8 w-8 rounded hover:bg-surface-subtle text-on-surface" type="button">2</button>
+<button class="h-8 w-8 rounded hover:bg-surface-subtle text-on-surface" type="button">3</button>
+<span class="px-1 text-status-neutral">...</span>
+<button class="h-8 w-8 rounded hover:bg-surface-subtle text-on-surface" type="button">125</button>
+<button class="h-8 w-8 rounded flex items-center justify-center text-on-surface hover:bg-surface-subtle" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+<button class="h-8 w-8 rounded flex items-center justify-center text-on-surface hover:bg-surface-subtle" type="button">
+<span class="material-symbols-outlined text-[18px]">keyboard_double_arrow_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right / Quick Asset Detail Drawer & History Preview (4 cols on large screens) -->
+<div class="xl:col-span-4 flex flex-col gap-space-md" id="asset-drawer">
+<!-- Primary Card: Selected Asset Inspector -->
+<div class="bg-surface-card rounded-lg shadow-sm p-space-lg flex flex-col">
+<!-- Header with Tag and Status -->
+<div class="flex items-start justify-between gap-space-sm mb-space-md">
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm text-secondary font-bold tracking-wide">AST-IT-2024-0129</span>
+<h2 class="font-title-md text-title-md text-on-surface font-bold leading-snug">Dell XPS 15 9530 Touch</h2>
+<span class="text-status-neutral font-label-sm text-label-sm">Procurement PO: PO-2024-0012 • PT Indo Dell Prima</span>
+</div>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full font-label-sm text-label-sm bg-surface-container text-status-assigned border border-surface-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-status-assigned mr-1.5"></span>ASSIGNED
+          </span>
+</div>
+<!-- Asset Media and Interactive QR Code Grid -->
+<div class="grid grid-cols-12 gap-space-sm mb-space-md bg-surface-canvas p-space-sm rounded">
+<div class="col-span-8 overflow-hidden rounded">
+<img class="w-full h-36 object-cover rounded hover:scale-105 transition-transform duration-300" data-alt="High precision photorealistic close-up photo of Dell XPS 15 laptop chassis keyboard and screen under executive architectural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4Bp-eNtzyFwIiFvs6X9BU1jfyxJKQ3N35RmswrxwTCUqW_eEp2aKpWbd-TgK8Zr60eXPJ-Ga-KNQw1v138BqdudxPWzBbLAV0YuJ3JA1XbKTk_5FBwnGvjj8F2DPm63699pnTJTcLMPlGsbcE9br3LExzxOgPBX8YqTt47tpfXXXiJae6RhmA7G3oWlya4YzKyn1tBpdvB3wRfseODcA2k-LCElxSmZ_ZnAmi58hZvFlwZEibHW8HEg"/>
+</div>
+<!-- Real-Time Dynamic QR Code Generator Preview -->
+<div class="col-span-4 flex flex-col items-center justify-center bg-surface-card p-2 rounded shadow-sm text-center">
+<!-- Inline SVG Authentic QR Code Pattern -->
+<svg class="w-20 h-20 text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<rect height="30" width="30" x="0" y="0"></rect>
+<rect fill="white" height="20" width="20" x="5" y="5"></rect>
+<rect height="12" width="12" x="9" y="9"></rect>
+<rect height="30" width="30" x="70" y="0"></rect>
+<rect fill="white" height="20" width="20" x="75" y="5"></rect>
+<rect height="12" width="12" x="79" y="9"></rect>
+<rect height="30" width="30" x="0" y="70"></rect>
+<rect fill="white" height="20" width="20" x="5" y="75"></rect>
+<rect height="12" width="12" x="9" y="79"></rect>
+<!-- Randomized matrix blocks -->
+<rect height="10" width="10" x="40" y="10"></rect>
+<rect height="10" width="5" x="55" y="15"></rect>
+<rect height="10" width="30" x="35" y="35"></rect>
+<rect height="20" width="10" x="70" y="45"></rect>
+<rect height="10" width="15" x="45" y="60"></rect>
+<rect height="15" width="15" x="85" y="80"></rect>
+<rect height="10" width="10" x="40" y="85"></rect>
+</svg>
+<span class="font-code-sm text-[10px] text-status-neutral mt-1">SCAN VERIFIED</span>
+</div>
+</div>
+<!-- Technical Specification Metrix -->
+<div class="space-y-space-xs mb-space-md">
+<div class="flex items-center justify-between text-body-sm py-1 border-b border-border-subtle">
+<span class="text-status-neutral font-label-md text-label-md">Nomor Seri (SN)</span>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">SN-DL-8839210-JK</span>
+</div>
+<div class="flex items-center justify-between text-body-sm py-1 border-b border-border-subtle">
+<span class="text-status-neutral font-label-md text-label-md">Kategori Aset</span>
+<span class="text-on-surface font-label-md text-label-md">IT Hardware (Komputer/Laptop)</span>
+</div>
+<div class="flex items-center justify-between text-body-sm py-1 border-b border-border-subtle">
+<span class="text-status-neutral font-label-md text-label-md">Tanggal Akuisisi</span>
+<span class="font-code-sm text-code-sm text-on-surface">15 Jan 2024</span>
+</div>
+<div class="flex items-center justify-between text-body-sm py-1 border-b border-border-subtle">
+<span class="text-status-neutral font-label-md text-label-md">Garansi Resmi</span>
+<span class="text-status-available font-label-md text-label-md flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[15px]">verified_user</span>Aktif s/d 14 Jan 2027 (3 Thn)
+            </span>
+</div>
+<div class="flex items-center justify-between text-body-sm py-1 border-b border-border-subtle">
+<span class="text-status-neutral font-label-md text-label-md">Nilai Perolehan</span>
+<span class="font-code-sm text-code-sm text-on-surface font-bold">Rp 34.500.000,-</span>
+</div>
+</div>
+<!-- Current Assignee Profile Snapshot (Master Karyawan) -->
+<div class="bg-surface-canvas p-space-md rounded-lg mb-space-md">
+<span class="font-label-sm text-label-sm text-status-neutral uppercase tracking-wider block mb-space-xs">Pemegang Saat Ini (Custodian)</span>
+<div class="flex items-center gap-space-sm">
+<img alt="Bambang" class="w-10 h-10 rounded-full object-cover ring-2 ring-secondary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKbhE8ATW8tJCkjiZCT1FfhynOfHH1TfEy21O3VIbpTq8Fu3rxyfryFZ3wgNoiquBwzXTu1P4ipex9MLmlQEAg1U3r4aM26iKhpy1NvE4tULHpbu1eii5Nl0YFfHhhz9cp5Z7a9gAGNwOZJggiJMqWW8dB7CgyMJFJJlOYP18jsIu-q9bf4GQDQq1HJA1gnbyIUK49R4UNaDyAKsnkzwRvLpvMsAxcgCoxrF8C6gEQ0vZUQBQBr5Nabw"/>
+<div class="flex flex-col min-w-0 flex-1">
+<span class="font-label-md text-label-md text-on-surface font-bold truncate">Bambang Pratama, S.Kom</span>
+<span class="text-status-neutral font-body-sm text-[12px] truncate">Principal Lead IT Infrastructure</span>
+<span class="font-code-sm text-[11px] text-secondary">NIP: EMP-00194 • Manager: Budi Santoso (VP IT)</span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-border-subtle flex items-center justify-between text-[11px] text-status-neutral font-code-sm">
+<span>Diserahkan: 20 Jan 2024</span>
+<span class="text-status-available font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">task_alt</span>Dokumen BAST Valid
+            </span>
+</div>
+</div>
+<!-- Asset Audit Trail & Assignment History Timeline (Document 1 Compliant) -->
+<div class="flex flex-col mb-space-md">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider">Riwayat Siklus Hidup Aset</span>
+<span class="font-code-sm text-[11px] text-status-neutral">4 Riwayat Acara</span>
+</div>
+<div class="relative pl-6 space-y-4 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-strong">
+<!-- Timeline Item 1 -->
+<div class="relative group">
+<div class="absolute -left-[19px] top-0.5 w-3 h-3 rounded-full bg-status-assigned ring-4 ring-surface-card"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Serah Terima Jangka Panjang (Handover)</span>
+<span class="text-status-neutral font-body-sm text-[12px]">Diserahkan ke Bambang Pratama (EMP-00194)</span>
+<span class="font-code-sm text-[11px] text-status-neutral mt-0.5">20 Jan 2024, 14:15 • Approval Manager: Budi Santoso</span>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative group">
+<div class="absolute -left-[19px] top-0.5 w-3 h-3 rounded-full bg-status-available ring-4 ring-surface-card"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Penerimaan &amp; Registrasi Tag Aset</span>
+<span class="text-status-neutral font-body-sm text-[12px]">Diverifikasi kondisi BAIK 100% oleh Tim Gudang IT</span>
+<span class="font-code-sm text-[11px] text-status-neutral mt-0.5">18 Jan 2024, 09:30 • PO-2024-0012</span>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative group">
+<div class="absolute -left-[19px] top-0.5 w-3 h-3 rounded-full bg-status-neutral ring-4 ring-surface-card"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Persetujuan Pengadaan (Procurement)</span>
+<span class="text-status-neutral font-body-sm text-[12px]">Approved oleh Finance Director &amp; CIO</span>
+<span class="font-code-sm text-[11px] text-status-neutral mt-0.5">10 Jan 2024, 11:20 • PR-IT-992</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Drawer Buttons -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<button class="h-9 px-space-md bg-surface-canvas hover:bg-surface-subtle border border-border-strong text-on-surface font-label-md text-label-md rounded flex items-center justify-center gap-1.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">print</span>
+<span>Cetak Tag RFID</span>
+</button>
+<button class="h-9 px-space-md bg-primary-container text-on-primary hover:bg-inverse-surface font-label-md text-label-md rounded flex items-center justify-center gap-1.5 transition-colors shadow" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary-container">edit_document</span>
+<span>Ubah Detail</span>
+</button>
+</div>
+</div>
+<!-- Quick Maintenance SLA Notice Widget -->
+<div class="bg-surface-card rounded-lg shadow-sm p-space-md flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-status-assigned flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">shield_with_heart</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Jadwal Kalibrasi &amp; Audit Fisik Q2</span>
+<span class="text-status-neutral font-body-sm text-[12px]">Stock opname menyeluruh dijadwalkan pada 28 Juni 2025.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple tab interactive switcher
+  function filterTab(status) {
+    const tabs = document.querySelectorAll('.asset-tab');
+    tabs.forEach(tab => {
+      tab.classList.remove('bg-primary-container', 'text-on-primary', 'shadow-sm');
+      tab.classList.add('text-on-surface-variant');
+    });
+
+    event.currentTarget.classList.add('bg-primary-container', 'text-on-primary', 'shadow-sm');
+    event.currentTarget.classList.remove('text-on-surface-variant');
+
+    const rows = document.querySelectorAll('#asset-table-body tr');
+    rows.forEach(row => {
+      if (status === 'ALL') {
+        row.style.display = '';
+      } else {
+        const rowText = row.innerText.toUpperCase();
+        row.style.display = rowText.includes(status) ? '' : 'none';
+      }
+    });
+  }
+
+  // Row dropdown toggler
+  function toggleRowDropdown(event, id) {
+    event.stopPropagation();
+    const dropdown = document.getElementById(id);
+    const isHidden = dropdown.classList.contains('hidden');
+    
+    // Close other dropdowns
+    document.querySelectorAll('[id^="drop-"]').forEach(el => el.classList.add('hidden'));
+
+    if (isHidden) {
+      dropdown.classList.remove('hidden');
+    } else {
+      dropdown.classList.add('hidden');
+    }
+  }
+
+  // Global click outside to dismiss popups
+  window.addEventListener('click', () => {
+    document.querySelectorAll('[id^="drop-"]').forEach(el => el.classList.add('hidden'));
+  });
+
+  // Interactive quick asset select
+  function selectAsset(tag) {
+    // Highlight table row logic or load asset detail
+    console.log("Selected asset:", tag);
+  }
+
+  function exportData(type) {
+    alert("Mengekspor data katalog master aset (" + type.toUpperCase() + ") sesuai standar ISO-27001...");
+  }
+</script></main><footer class="w-full px-gutter py-space-md bg-surface-card shadow-[0_-1px_4px_rgba(0,0,0,0.02)]"><div class="flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-sm text-label-sm text-outline"><span>AssetPro Management v2.4 • PT Enterprise Solusi</span><span class="font-code-sm text-code-sm text-status-neutral">ISO 27001 Certified • Fiscal Audit System</span></div></footer></div></body></html>
