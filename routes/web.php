@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AccessMatrixController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
@@ -146,6 +147,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class)->except(['show', 'destroy'])->middleware('permission:user.manage');
         Route::resource('roles', RoleController::class)->except(['show'])->middleware('permission:role.manage');
+        Route::get('access-matrix', [AccessMatrixController::class, 'index'])->middleware('permission:role.manage')->name('access.index');
+        Route::put('access-matrix', [AccessMatrixController::class, 'update'])->middleware('permission:role.manage')->name('access.update');
         Route::get('settings', [SettingController::class, 'edit'])->middleware('permission:setting.manage')->name('settings.edit');
         Route::put('settings', [SettingController::class, 'update'])->middleware('permission:setting.manage')->name('settings.update');
         Route::get('audit-logs', [AuditLogController::class, 'index'])->middleware('permission:audit.view')->name('audit.index');

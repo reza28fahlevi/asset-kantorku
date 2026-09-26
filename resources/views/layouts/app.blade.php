@@ -36,9 +36,12 @@
             $link('Vendor', 'masters.vendors.index', 'masters.vendors.*', ['master.view', 'master.manage']),
         ]],
         ['label' => 'Laporan', 'icon' => 'analytics', 'route' => 'reports.index', 'active' => 'reports.*', 'perm' => ['report.view']],
-        ['label' => 'Administrasi', 'icon' => 'admin_panel_settings', 'active' => ['admin.*'], 'children' => [
-            $link('Pengguna', 'admin.users.index', 'admin.users.*', ['user.manage']),
-            $link('Role & Hak Akses', 'admin.roles.index', 'admin.roles.*', ['role.manage']),
+        ['label' => 'Role Based Access', 'icon' => 'shield_person', 'active' => ['admin.users.*', 'admin.roles.*', 'admin.access.*'], 'children' => [
+            $link('Pengguna & Multi Role', 'admin.users.index', 'admin.users.*', ['user.manage']),
+            $link('Daftar Role', 'admin.roles.index', 'admin.roles.*', ['role.manage']),
+            $link('Matriks Otorisasi', 'admin.access.index', 'admin.access.*', ['role.manage']),
+        ]],
+        ['label' => 'Administrasi', 'icon' => 'admin_panel_settings', 'active' => ['admin.settings.*', 'admin.audit.*'], 'children' => [
             $link('Pengaturan', 'admin.settings.edit', 'admin.settings.*', ['setting.manage']),
             $link('Audit Log', 'admin.audit.index', 'admin.audit.*', ['audit.view']),
         ]],

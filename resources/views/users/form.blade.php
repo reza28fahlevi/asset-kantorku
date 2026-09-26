@@ -53,17 +53,43 @@
             </div>
         </x-card>
 
-        <x-card title="Role Akses" icon="shield_person">
+        @php
+            $rolePermissions = $roles->mapWithKeys(fn ($r) => [$r->id => $r->permissions->map(fn ($p) => ['id' => $p->id, 'label' => $p->display_name ?: $p->name, 'group' => $p->group_name ?: 'Umum'])->values()]);
+        @endphp
+        <x-card title="Role Akses (Multi Role)" icon="shield_person" x-data="rolePicker(@js($selectedRoles), @js($rolePermissions))">
+            <p class="text-body-sm text-on-surface-variant mb-space-md">Pilih satu atau lebih role. Hak akses user adalah gabungan dari seluruh role yang dipilih.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
                 @foreach ($roles as $r)
-                    <label class="flex items-start gap-2 p-space-sm rounded border border-border-subtle hover:bg-surface cursor-pointer">
-                        <input type="checkbox" name="roles[]" value="{{ $r->id }}" class="rounded border-border-subtle mt-1" @checked(in_array($r->id, $selectedRoles, true))>
-                        <span>
-                            <span class="text-body-md font-semibold text-on-surface">{{ $r->display_name }}</span>
+                    <label class="flex items-start gap-2 p-space-sm rounded border cursor-pointer transition-colors"
+                           :class="selected.includes({{ $r->id }}) ? 'border-secondary bg-secondary-fixed/30' : 'border-border-subtle hover:bg-surface-subtle'">
+                        <input type="checkbox" name="roles[]" value="{{ $r->id }}" x-model.number="selected" class="rounded border-border-strong mt-1 text-primary-container focus:ring-secondary">
+                        <span class="flex-1">
+                            <span class="flex items-center justify-between gap-2">
+                                <span class="text-body-md font-semibold text-on-surface">{{ $r->display_name }}</span>
+                                <span class="text-label-sm font-normal text-outline">{{ $r->permissions->count() }} hak</span>
+                            </span>
                             <span class="block text-body-sm text-on-surface-variant">{{ $r->description ?: $r->name }}</span>
                         </span>
                     </label>
                 @endforeach
+            </div>
+            <div class="mt-space-lg rounded-lg bg-surface-subtle p-space-md">
+                <p class="text-label-sm uppercase text-outline mb-space-sm">
+                    Hak akses efektif · <span x-text="selected.length"></span> role · <span x-text="effective().length"></span> permission
+                </p>
+                <p x-show="!selected.length" class="text-body-sm text-outline">Belum ada role dipilih.</p>
+                <div class="space-y-space-sm max-h-64 overflow-y-auto">
+                    <template x-for="[group, items] in grouped()" :key="group">
+                        <div>
+                            <p class="text-label-md text-on-surface" x-text="group"></p>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                <template x-for="p in items" :key="p.id">
+                                    <span class="px-2 py-0.5 rounded-full bg-surface-card ring-1 ring-border-subtle text-label-sm font-normal" x-text="p.label"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </div>
             @error('roles')<p class="form-error">{{ $message }}</p>@enderror
             @error('roles.*')<p class="form-error">{{ $message }}</p>@enderror
@@ -96,3 +122,23 @@
     </div>
 </form>
 @endsection
+
+@push('scripts')
+<script>
+    function rolePicker(selected, rolePermissions) {
+        return {
+            selected: selected,
+            effective() {
+                const map = new Map();
+                this.selected.forEach(id => (rolePermissions[id] || []).forEach(p => map.set(p.id, p)));
+                return [...map.values()];
+            },
+            grouped() {
+                const groups = {};
+                this.effective().forEach(p => (groups[p.group] ??= []).push(p));
+                return Object.entries(groups).sort();
+            },
+        };
+    }
+</script>
+@endpush

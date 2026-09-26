@@ -78,7 +78,7 @@ class UserController extends Controller
     {
         return view('users.form', [
             'user' => $user,
-            'roles' => Role::orderBy('display_name')->get(),
+            'roles' => Role::with('permissions:id,name,display_name,group_name')->orderBy('display_name')->get(),
             // Karyawan yang belum punya akun (atau karyawan milik akun ini)
             'employees' => Employee::query()
                 ->where(fn ($q) => $q->whereDoesntHave('user')->when($user->employee_id, fn ($w) => $w->orWhere('id', $user->employee_id)))
