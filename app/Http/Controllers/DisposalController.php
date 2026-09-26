@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Support\Like;
 
 class DisposalController extends Controller
 {
@@ -32,7 +33,7 @@ class DisposalController extends Controller
         $base = DisposalRequest::query()
             ->visibleTo($request->user())
             ->when($request->query('q'), function ($q, $t) {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $t).'%';
+                $like = Like::contains($t);
                 $q->where(fn ($w) => $w
                     ->where('request_no', 'ilike', $like)
                     ->orWhereHas('asset', fn ($a) => $a->search($t))
@@ -115,10 +116,11 @@ class DisposalController extends Controller
         return back()->with('success', "{$disposal->request_no} berhasil diajukan.");
     }
 
-    public function cancel(DisposalRequest $disposal): RedirectResponse
+    public function cancel(Request $request, DisposalRequest $disposal): RedirectResponse
     {
         $this->authorize('cancel', $disposal);
-        $this->service->cancel($disposal);
+        $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
+        $this->service->cancel($disposal, $request->user(), $data['cancel_reason'] ?? null);
 
         return back()->with('success', "{$disposal->request_no} dibatalkan.");
     }

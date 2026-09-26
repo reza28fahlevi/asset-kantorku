@@ -12,9 +12,7 @@
         </x-confirm-form>
     @endcan
     @can('cancel', $loanRequest)
-        <x-confirm-form :action="route('loans.cancel', $loanRequest)" confirm="Batalkan permintaan ini?" button="btn btn-danger">
-            <span class="material-symbols-outlined !text-[18px]">cancel</span> Batalkan
-        </x-confirm-form>
+        <x-cancel-request :action="route('loans.cancel', $loanRequest)" :approved="$loanRequest->status === \App\Enums\RequestStatus::Approved" label="permintaan peminjaman"/>
     @endcan
 @endsection
 @section('content')
@@ -32,7 +30,7 @@
                 <dt>Periode</dt><dd>{{ $loanRequest->start_date?->format('d M Y') }} &ndash; {{ $loanRequest->due_date?->format('d M Y') }}@if ($days) <span class="text-on-surface-variant">({{ $days }} hari)</span>@endif</dd>
                 <dt>Diajukan</dt><dd>{{ $loanRequest->submitted_at?->format('d M Y H:i') ?? '-' }}</dd>
                 @if ($loanRequest->fulfilled_at)<dt>Terlaksana</dt><dd>{{ $loanRequest->fulfilled_at->format('d M Y H:i') }}</dd>@endif
-                @if ($loanRequest->cancelled_at)<dt>Dibatalkan</dt><dd>{{ $loanRequest->cancelled_at->format('d M Y H:i') }}</dd>@endif
+                @if ($loanRequest->cancelled_at)<dt>Dibatalkan</dt><dd>{{ $loanRequest->cancelled_at->format('d M Y H:i') }}@if ($loanRequest->cancelledBy) · {{ $loanRequest->cancelledBy->name }}@endif</dd>@if ($loanRequest->cancel_reason)<dt>Alasan Batal</dt><dd>{{ $loanRequest->cancel_reason }}</dd>@endif @endif
                 <dt>Tujuan</dt><dd class="whitespace-pre-line">{{ $loanRequest->purpose }}</dd>
             </dl>
         </x-card>

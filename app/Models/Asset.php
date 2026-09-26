@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Support\Like;
 
 #[Fillable([
     'asset_tag', 'name', 'asset_category_id', 'procurement_request_item_id', 'procurement_receipt_id',
@@ -104,7 +105,8 @@ class Asset extends Model
         if (blank($term)) {
             return;
         }
-        $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $term).'%';
+        // Escape karakter khusus LIKE, termasuk backslash (escape default PostgreSQL) agar term dicari apa adanya.
+        $like = Like::contains($term);
         $query->where(fn (Builder $q) => $q
             ->where('asset_tag', 'ilike', $like)
             ->orWhere('name', 'ilike', $like)
@@ -120,8 +122,9 @@ class Asset extends Model
 
     public function isWarrantyExpiringSoon(int $days = 30): bool
     {
+        // Dibandingkan per tanggal: garansi yang berakhir hari ini masih dihitung "segera berakhir"
         return $this->warranty_end_date !== null
-            && $this->warranty_end_date->isFuture()
-            && now()->diffInDays($this->warranty_end_date) <= $days;
+            && $this->warranty_end_date->copy()->startOfDay()->gte(today())
+            && today()->diffInDays($this->warranty_end_date->copy()->startOfDay()) <= $days;
     }
 }

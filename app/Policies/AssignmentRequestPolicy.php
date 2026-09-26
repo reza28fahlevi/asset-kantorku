@@ -23,6 +23,16 @@ class AssignmentRequestPolicy extends RequestPolicy
         return RequestStatus::Draft;
     }
 
+    protected function approvedStatus(): \BackedEnum
+    {
+        return RequestStatus::Approved;
+    }
+
+    protected function fulfillPermission(): string
+    {
+        return 'assignment.handover';
+    }
+
     public function handover(User $user, AssignmentRequest $request): bool
     {
         return $request->status === RequestStatus::Approved && $user->hasPermission('assignment.handover');

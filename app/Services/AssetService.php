@@ -134,6 +134,9 @@ class AssetService
     {
         return DB::transaction(function () use ($data) {
             $category = AssetCategory::findOrFail($data['asset_category_id']);
+            if ($category->requires_serial && blank($data['serial_number'] ?? null)) {
+                throw new BusinessRuleException("Nomor seri wajib diisi untuk kategori {$category->name}.");
+            }
 
             $asset = Asset::create(array_merge($data, [
                 'asset_tag' => $this->numbers->assetTag($category->code),

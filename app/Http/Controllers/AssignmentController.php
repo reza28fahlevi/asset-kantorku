@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Support\Like;
 
 class AssignmentController extends Controller
 {
@@ -34,7 +35,7 @@ class AssignmentController extends Controller
         $base = AssignmentRequest::query()
             ->visibleTo($request->user())
             ->when($request->query('q'), function ($q, $t) {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $t).'%';
+                $like = Like::contains($t);
                 $q->where(fn ($w) => $w
                     ->where('request_no', 'ilike', $like)
                     ->orWhereHas('requester', fn ($e) => $e->where('name', 'ilike', $like))
@@ -77,7 +78,7 @@ class AssignmentController extends Controller
             ->unless($user->hasPermission('assignment.view_all'), fn ($q) => $q->where('employee_id', $user->employee_id ?? 0))
             ->when($request->query('q'), fn ($q, $t) => $q->where(fn ($w) => $w
                 ->whereHas('asset', fn ($a) => $a->search($t))
-                ->orWhereHas('employee', fn ($e) => $e->where('name', 'ilike', "%{$t}%"))))
+                ->orWhereHas('employee', fn ($e) => $e->where('name', 'ilike', Like::contains($t)))))
             ->orderByDesc('assigned_at')
             ->paginate(15)
             ->withQueryString();
@@ -144,10 +145,11 @@ class AssignmentController extends Controller
         return back()->with('success', "{$assignment->request_no} berhasil diajukan.");
     }
 
-    public function cancel(AssignmentRequest $assignment): RedirectResponse
+    public function cancel(Request $request, AssignmentRequest $assignment): RedirectResponse
     {
         $this->authorize('cancel', $assignment);
-        $this->service->cancel($assignment);
+        $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
+        $this->service->cancel($assignment, $request->user(), $data['cancel_reason'] ?? null);
 
         return back()->with('success', "{$assignment->request_no} dibatalkan.");
     }

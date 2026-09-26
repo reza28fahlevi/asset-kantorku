@@ -12,9 +12,7 @@
         </x-confirm-form>
     @endcan
     @can('cancel', $assignment)
-        <x-confirm-form :action="route('assignments.cancel', $assignment)" confirm="Batalkan permintaan ini?" button="btn btn-danger">
-            <span class="material-symbols-outlined !text-[18px]">cancel</span> Batalkan
-        </x-confirm-form>
+        <x-cancel-request :action="route('assignments.cancel', $assignment)" :approved="$assignment->status === \App\Enums\RequestStatus::Approved" label="permintaan serah terima"/>
     @endcan
 @endsection
 @section('content')
@@ -31,7 +29,7 @@
                 <dt>Tanggal Mulai</dt><dd>{{ $assignment->start_date?->format('d M Y') }}</dd>
                 <dt>Diajukan</dt><dd>{{ $assignment->submitted_at?->format('d M Y H:i') ?? '-' }}</dd>
                 @if ($assignment->fulfilled_at)<dt>Terlaksana</dt><dd>{{ $assignment->fulfilled_at->format('d M Y H:i') }}</dd>@endif
-                @if ($assignment->cancelled_at)<dt>Dibatalkan</dt><dd>{{ $assignment->cancelled_at->format('d M Y H:i') }}</dd>@endif
+                @if ($assignment->cancelled_at)<dt>Dibatalkan</dt><dd>{{ $assignment->cancelled_at->format('d M Y H:i') }}@if ($assignment->cancelledBy) · {{ $assignment->cancelledBy->name }}@endif</dd>@if ($assignment->cancel_reason)<dt>Alasan Batal</dt><dd>{{ $assignment->cancel_reason }}</dd>@endif @endif
                 <dt>Tujuan</dt><dd class="whitespace-pre-line">{{ $assignment->purpose }}</dd>
             </dl>
         </x-card>

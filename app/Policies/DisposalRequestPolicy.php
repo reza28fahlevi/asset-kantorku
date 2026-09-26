@@ -23,6 +23,16 @@ class DisposalRequestPolicy extends RequestPolicy
         return DisposalStatus::Draft;
     }
 
+    protected function approvedStatus(): \BackedEnum
+    {
+        return DisposalStatus::Approved;
+    }
+
+    protected function fulfillPermission(): string
+    {
+        return 'disposal.execute';
+    }
+
     public function execute(User $user, DisposalRequest $request): bool
     {
         return $request->status === DisposalStatus::Approved && $user->hasPermission('disposal.execute');

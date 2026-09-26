@@ -76,6 +76,8 @@ class LoanService implements ApprovalHandler
             if ($request->start_date->lt(today())) {
                 throw new BusinessRuleException('Tanggal mulai sudah lewat. Batalkan dan buat permintaan baru.');
             }
+            // Cek ulang durasi: pengaturan maksimal bisa berubah sejak draft dibuat
+            $this->ensureDuration($request->start_date, $request->due_date);
 
             $assetIds = $request->assets()->pluck('assets.id')->all();
             $this->assets->lockAvailable($assetIds);
@@ -86,14 +88,23 @@ class LoanService implements ApprovalHandler
         });
     }
 
-    public function cancel(AssetLoanRequest $request): void
+
+    /**
+     * Status yang boleh dibatalkan: draft & menunggu approval, atau sudah disetujui namun belum
+     * ditindaklanjuti. Pembatalan setelah disetujui wajib beralasan, tercatat di audit log, dan
+     * requester diberi tahu bila dibatalkan oleh petugas.
+     */
+    public function cancel(AssetLoanRequest $request, ?User $user = null, ?string $reason = null): void
     {
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $user, $reason) {
             $request = AssetLoanRequest::whereKey($request->id)->lockForUpdate()->firstOrFail();
-            $this->ensureStatus($request->status, [RequestStatus::Draft, RequestStatus::PendingApproval], 'membatalkan peminjaman');
+            $this->ensureStatus($request->status, [RequestStatus::Draft, RequestStatus::PendingApproval, RequestStatus::Approved], 'membatalkan peminjaman');
+            $wasApproved = $request->status === RequestStatus::Approved;
+            $reason = $this->cancelReason($wasApproved, $reason);
 
             $this->approvals->cancel($request->approvalRequest);
-            $request->update(['status' => RequestStatus::Cancelled, 'cancelled_at' => now()]);
+            $request->update(['status' => RequestStatus::Cancelled, 'cancelled_at' => now(), 'cancel_reason' => $reason, 'cancelled_by_user_id' => $user?->id]);
+            $this->afterCancel($request, $wasApproved, $user, $reason, route('loans.show', $request));
         });
     }
 
@@ -130,6 +141,12 @@ class LoanService implements ApprovalHandler
             $this->ensureActiveEmployee($request->borrower, 'Peminjam');
 
             $checkedOutAt = Carbon::parse($data['checked_out_at']);
+            if ($checkedOutAt->lt($request->start_date->copy()->startOfDay())) {
+                throw new BusinessRuleException('Waktu serah-terima tidak boleh sebelum tanggal mulai peminjaman ('.$request->start_date->format('d M Y').').');
+            }
+            if ($checkedOutAt->isFuture()) {
+                throw new BusinessRuleException('Waktu serah-terima tidak boleh di masa depan.');
+            }
             $dueAt = $request->due_date->copy()->endOfDay()->startOfSecond();
             if ($dueAt->lte($checkedOutAt)) {
                 throw new BusinessRuleException('Waktu serah-terima melewati due date. Ajukan peminjaman baru dengan tanggal yang sesuai.');
@@ -306,8 +323,15 @@ class LoanService implements ApprovalHandler
             ->where('due_at', '<', now())
             ->with(['asset', 'borrower.user'])
             ->get()
-            ->each(function (AssetLoan $loan) use (&$count) {
-                DB::transaction(function () use ($loan) {
+            ->each(function (AssetLoan $candidate) use (&$count) {
+                $marked = DB::transaction(function () use ($candidate) {
+                    // Validasi ulang dengan row lock: loan bisa saja sudah dikembalikan/diperpanjang sejak dibaca
+                    $loan = AssetLoan::whereKey($candidate->id)->lockForUpdate()->first();
+                    if (! $loan || $loan->status !== LoanStatus::CheckedOut || ! $loan->due_at->isPast()) {
+                        return false;
+                    }
+                    $loan->setRelations($candidate->getRelations());
+
                     $loan->update(['status' => LoanStatus::Overdue, 'is_late' => true]);
                     $this->assets->recordEvent($loan->asset, AssetEventType::LoanOverdue, [
                         'related_employee_id' => $loan->borrower_employee_id,
@@ -318,8 +342,10 @@ class LoanService implements ApprovalHandler
                     $message = "Aset {$loan->asset->asset_tag} melewati batas pengembalian ({$loan->due_at->translatedFormat('d M Y')}).";
                     $this->notifier->toEmployee($loan->borrower, 'Peminjaman terlambat', $message, route('loans.active'), 'bi-alarm');
                     $this->notifier->toPermission('loan.return', 'Peminjaman terlambat', $message, route('loans.active'), 'bi-alarm');
+
+                    return true;
                 });
-                $count++;
+                $count += $marked ? 1 : 0;
             });
 
         return $count;

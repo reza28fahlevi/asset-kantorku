@@ -19,7 +19,8 @@ class AttachmentService
     {
         $max = (int) Setting::get('attachment.max_size_kb', 5120);
 
-        return [$required ? 'required' : 'nullable', 'file', 'mimes:'.self::ALLOWED_MIMES, "max:{$max}"];
+        // "mimes" hanya memeriksa isi file; "extensions" memastikan ekstensi nama file (dipakai saat disimpan) juga diizinkan.
+        return [$required ? 'required' : 'nullable', 'file', 'mimes:'.self::ALLOWED_MIMES, 'extensions:'.self::ALLOWED_MIMES, "max:{$max}"];
     }
 
     /**
@@ -29,7 +30,10 @@ class AttachmentService
      */
     public function store(Model $owner, UploadedFile|array|null $files, string $category = 'OTHER'): void
     {
-        foreach (array_filter((array) $files) as $file) {
+        // (array) pada objek UploadedFile menghasilkan properti internalnya, bukan [$file].
+        $files = $files instanceof UploadedFile ? [$files] : (array) $files;
+
+        foreach (array_filter($files) as $file) {
             $dir = 'attachments/'.$owner->getMorphClass().'/'.$owner->getKey();
             $name = Str::uuid().'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs($dir, $name, 'local');

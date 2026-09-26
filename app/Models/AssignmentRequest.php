@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'request_no', 'approval_request_id', 'requester_employee_id', 'created_by_user_id', 'recipient_employee_id',
-    'location_id', 'purpose', 'start_date', 'status', 'submitted_at', 'fulfilled_at', 'cancelled_at',
+    'location_id', 'purpose', 'start_date', 'status', 'submitted_at', 'fulfilled_at', 'cancelled_at', 'cancel_reason', 'cancelled_by_user_id',
 ])]
 class AssignmentRequest extends Model implements Approvable
 {
@@ -88,5 +88,10 @@ class AssignmentRequest extends Model implements Approvable
     public function approvalUrl(): string
     {
         return route('assignments.show', $this);
+    }
+
+    public function cancelledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by_user_id');
     }
 }

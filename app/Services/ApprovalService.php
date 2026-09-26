@@ -104,7 +104,8 @@ class ApprovalService
      */
     public function decide(ApprovalStep $step, User $user, bool $approve, ?string $comment): ApprovalRequest
     {
-        $comment = trim((string) $comment) ?: null;
+        $comment = trim((string) $comment);
+        $comment = $comment === '' ? null : $comment;
         if (! $approve && $comment === null) {
             throw new BusinessRuleException('Alasan penolakan wajib diisi.');
         }
@@ -154,6 +155,63 @@ class ApprovalService
 
             return $approval;
         });
+    }
+
+    /**
+     * Alihkan step PENDING yang approver-nya tidak lagi memenuhi syarat (karyawan nonaktif/cuti,
+     * akun nonaktif, atau kehilangan permission approval). Snapshot approver bersifat immutable,
+     * sehingga step lama ditutup (CANCELLED + catatan) dan step baru dibuat untuk approver pengganti
+     * (atasan terkini bila valid, selain itu approver eskalasi).
+     *
+     * @param  int|null  $employeeId  batasi ke approver tertentu; null = periksa semua step pending
+     * @return array{reassigned: int, failed: int}
+     */
+    public function reassignIneligibleSteps(?int $employeeId = null): array
+    {
+        $result = ['reassigned' => 0, 'failed' => 0];
+
+        $steps = ApprovalStep::query()
+            ->with('approver.user', 'approvalRequest.requester')
+            ->where('status', ApprovalStatus::Pending->value)
+            ->when($employeeId, fn ($q) => $q->where('approver_employee_id', $employeeId))
+            ->get()
+            ->reject(fn (ApprovalStep $step) => $step->approver?->isActive() && $step->approver->user?->isApprover());
+
+        foreach ($steps as $step) {
+            try {
+                DB::transaction(function () use ($step) {
+                    $step = ApprovalStep::whereKey($step->id)->lockForUpdate()->firstOrFail();
+                    $approval = ApprovalRequest::whereKey($step->approval_request_id)->lockForUpdate()->firstOrFail();
+                    if (! $step->isPending() || $approval->status !== ApprovalStatus::Pending) {
+                        return;
+                    }
+
+                    $subject = $approval->subject();
+                    [$approver, $source] = $this->resolveApprover($subject->approvalSubjectEmployee(), $approval->requester);
+
+                    $step->update([
+                        'status' => ApprovalStatus::Cancelled,
+                        'comment' => 'Dialihkan otomatis: approver '.($step->approver?->name ?? '#'.$step->approver_employee_id).' tidak lagi aktif/berwenang.',
+                    ]);
+                    $approval->steps()->create([
+                        'step_order' => (int) $approval->steps()->max('step_order') + 1,
+                        'approver_employee_id' => $approver->id,
+                        'approver_source' => $source,
+                        'status' => ApprovalStatus::Pending,
+                    ]);
+
+                    AuditLogger::log('approval_reassigned', $approval, ['approver_employee_id' => $step->approver_employee_id], ['approver_employee_id' => $approver->id]);
+                    $this->notifier->toEmployee($approver, 'Permintaan approval dialihkan kepada Anda',
+                        $subject->approvalTitle().' menunggu keputusan Anda (approver sebelumnya tidak aktif).', route('approvals.index'), 'bi-inbox');
+                });
+                $result['reassigned']++;
+            } catch (BusinessRuleException) {
+                // Tidak ada approver pengganti yang valid (eskalasi belum dikonfigurasi)
+                $result['failed']++;
+            }
+        }
+
+        return $result;
     }
 
     /** Batalkan approval yang masih berjalan (mis. requester membatalkan permintaan). */

@@ -21,13 +21,19 @@ class AttachmentPolicy
             $owner === null => false,
             $owner instanceof Asset => $user->hasPermission('asset.view'),
             $owner instanceof ProcurementReceipt => Gate::forUser($user)->allows('view', $owner->procurementRequest),
-            $owner instanceof AssetAssignment => $owner->assignment_request_id
-                ? Gate::forUser($user)->allows('view', $owner->assignmentRequest)
-                : $user->hasPermission('assignment.view_all'),
-            $owner instanceof AssetLoan => $owner->asset_loan_request_id
-                ? Gate::forUser($user)->allows('view', $owner->loanRequest)
-                : $user->hasPermission('loan.view_all'),
+            // Berita acara serah terima/peminjaman: pemegang/peminjam aset selalu boleh mengunduh miliknya
+            $owner instanceof AssetAssignment => $this->isOwnEmployee($user, $owner->employee_id)
+                || $user->hasPermission('assignment.view_all')
+                || ($owner->assignment_request_id && Gate::forUser($user)->allows('view', $owner->assignmentRequest)),
+            $owner instanceof AssetLoan => $this->isOwnEmployee($user, $owner->borrower_employee_id)
+                || $user->hasPermission('loan.view_all')
+                || ($owner->asset_loan_request_id && Gate::forUser($user)->allows('view', $owner->loanRequest)),
             default => Gate::forUser($user)->allows('view', $owner),
         };
+    }
+
+    private function isOwnEmployee(User $user, ?int $employeeId): bool
+    {
+        return $user->employee_id !== null && $employeeId !== null && $user->employee_id === $employeeId;
     }
 }

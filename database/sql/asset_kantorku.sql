@@ -758,13 +758,17 @@ CREATE TRIGGER trg_approval_requests_guard
 -- e) Satu aset tidak boleh memiliki assignment aktif DAN loan aktif bersamaan
 CREATE OR REPLACE FUNCTION fn_asset_assignment_loan_exclusive() RETURNS trigger AS $$
 BEGIN
-    IF TG_TABLE_NAME = 'asset_assignments' AND NEW.returned_at IS NULL THEN
-        IF EXISTS (SELECT 1 FROM asset_loans WHERE asset_id = NEW.asset_id AND status IN ('CHECKED_OUT', 'OVERDUE')) THEN
+    -- Kondisi per tabel dipisah (IF bersarang): PL/pgSQL tidak short-circuit akses kolom NEW,
+    -- sehingga NEW.status pada asset_assignments (tanpa kolom status) akan error.
+    IF TG_TABLE_NAME = 'asset_assignments' THEN
+        IF NEW.returned_at IS NULL
+            AND EXISTS (SELECT 1 FROM asset_loans WHERE asset_id = NEW.asset_id AND status IN ('CHECKED_OUT', 'OVERDUE')) THEN
             RAISE EXCEPTION 'Aset % sedang dipinjam; tidak dapat di-assign', NEW.asset_id
                 USING ERRCODE = 'check_violation';
         END IF;
-    ELSIF TG_TABLE_NAME = 'asset_loans' AND NEW.status IN ('CHECKED_OUT', 'OVERDUE') THEN
-        IF EXISTS (SELECT 1 FROM asset_assignments WHERE asset_id = NEW.asset_id AND returned_at IS NULL) THEN
+    ELSIF TG_TABLE_NAME = 'asset_loans' THEN
+        IF NEW.status IN ('CHECKED_OUT', 'OVERDUE')
+            AND EXISTS (SELECT 1 FROM asset_assignments WHERE asset_id = NEW.asset_id AND returned_at IS NULL) THEN
             RAISE EXCEPTION 'Aset % sedang ditugaskan; tidak dapat dipinjam', NEW.asset_id
                 USING ERRCODE = 'check_violation';
         END IF;

@@ -92,17 +92,29 @@ class DisposalService implements ApprovalHandler
         });
     }
 
-    public function cancel(DisposalRequest $request): void
+
+    /**
+     * Status yang boleh dibatalkan: draft & menunggu approval, atau sudah disetujui namun belum
+     * ditindaklanjuti. Pembatalan setelah disetujui wajib beralasan, tercatat di audit log, dan
+     * requester diberi tahu bila dibatalkan oleh petugas.
+     */
+    public function cancel(DisposalRequest $request, ?User $user = null, ?string $reason = null): void
     {
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $user, $reason) {
             $request = DisposalRequest::whereKey($request->id)->lockForUpdate()->firstOrFail();
-            $this->ensureStatus($request->status, [DisposalStatus::Draft, DisposalStatus::PendingApproval], 'membatalkan disposal');
+            $this->ensureStatus($request->status, [DisposalStatus::Draft, DisposalStatus::PendingApproval, DisposalStatus::Approved], 'membatalkan disposal');
+            $wasApproved = $request->status === DisposalStatus::Approved;
+            $reason = $this->cancelReason($wasApproved, $reason);
 
             if ($request->status === DisposalStatus::PendingApproval) {
                 $this->approvals->cancel($request->approvalRequest);
-                $this->restoreAsset($request, AssetEventType::DisposalCancelled, 'Pengajuan dibatalkan');
             }
-            $request->update(['status' => DisposalStatus::Cancelled, 'cancelled_at' => now()]);
+            if ($request->status !== DisposalStatus::Draft) {
+                // Aset yang tertahan "Menunggu Disposal" kembali ke status sebelumnya
+                $this->restoreAsset($request, AssetEventType::DisposalCancelled, $wasApproved ? 'Disposal disetujui dibatalkan: '.$reason : 'Pengajuan dibatalkan');
+            }
+            $request->update(['status' => DisposalStatus::Cancelled, 'cancelled_at' => now(), 'cancel_reason' => $reason, 'cancelled_by_user_id' => $user?->id]);
+            $this->afterCancel($request, $wasApproved, $user, $reason, route('disposals.show', $request));
         });
     }
 

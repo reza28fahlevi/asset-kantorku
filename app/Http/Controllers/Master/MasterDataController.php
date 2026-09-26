@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Support\Like;
 
 /**
  * CRUD generik untuk master referensi (departemen, lokasi, kategori, vendor).
@@ -46,7 +47,7 @@ abstract class MasterDataController extends Controller
         $items = $this->modelClass()::query()
             ->with($this->withRelations())
             ->when($term !== '', function ($query) use ($term) {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $term).'%';
+                $like = Like::contains($term);
                 $query->where(function ($q) use ($like) {
                     foreach ($this->searchColumns() as $column) {
                         $q->orWhere($column, 'ilike', $like);

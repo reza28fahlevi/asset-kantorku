@@ -56,7 +56,9 @@ class RoleController extends Controller
             $this->syncPermissions($role, $data['permissions'] ?? []);
         });
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role berhasil diperbarui.');
+        return $this->reassignApprovals(
+            redirect()->route('admin.roles.index')->with('success', 'Role berhasil diperbarui.')
+        );
     }
 
     public function destroy(Role $role): RedirectResponse

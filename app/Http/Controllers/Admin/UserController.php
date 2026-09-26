@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
+use App\Support\Like;
 
 class UserController extends Controller
 {
@@ -24,8 +25,8 @@ class UserController extends Controller
         $users = User::query()
             ->with('employee.department', 'roles')
             ->when($term !== '', fn ($q) => $q->where(fn ($w) => $w
-                ->where('name', 'ilike', "%{$term}%")
-                ->orWhere('email', 'ilike', "%{$term}%")))
+                ->where('name', 'ilike', Like::contains($term))
+                ->orWhere('email', 'ilike', Like::contains($term))))
             ->when($request->query('role'), fn ($q, $role) => $q->whereHas('roles', fn ($r) => $r->where('name', $role)))
             ->orderBy('name')
             ->paginate(15)
@@ -72,7 +73,9 @@ class UserController extends Controller
             $this->syncRoles($user, $data['roles']);
         });
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil diperbarui.');
+        return $this->reassignApprovals(
+            redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil diperbarui.')
+        );
     }
 
     private function form(User $user): View

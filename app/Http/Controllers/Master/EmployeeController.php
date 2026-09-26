@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Support\Like;
 
 class EmployeeController extends Controller
 {
@@ -22,9 +23,9 @@ class EmployeeController extends Controller
         $employees = Employee::query()
             ->with('department', 'manager', 'user')
             ->when($term !== '', fn ($q) => $q->where(fn ($w) => $w
-                ->where('name', 'ilike', "%{$term}%")
-                ->orWhere('employee_no', 'ilike', "%{$term}%")
-                ->orWhere('email', 'ilike', "%{$term}%")))
+                ->where('name', 'ilike', Like::contains($term))
+                ->orWhere('employee_no', 'ilike', Like::contains($term))
+                ->orWhere('email', 'ilike', Like::contains($term))))
             ->when($request->query('department_id'), fn ($q, $d) => $q->where('department_id', $d))
             ->when($request->query('status'), fn ($q, $s) => $q->where('employment_status', $s))
             ->orderBy('employee_no')
@@ -68,7 +69,9 @@ class EmployeeController extends Controller
     {
         $employee->update($this->validated($request, $employee));
 
-        return redirect()->route('masters.employees.show', $employee)->with('success', 'Data karyawan berhasil diperbarui.');
+        return $this->reassignApprovals(
+            redirect()->route('masters.employees.show', $employee)->with('success', 'Data karyawan berhasil diperbarui.')
+        );
     }
 
     private function form(Employee $employee): View

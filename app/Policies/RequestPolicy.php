@@ -20,6 +20,12 @@ abstract class RequestPolicy
     /** @return \BackedEnum status draft */
     abstract protected function draftStatus(): \BackedEnum;
 
+    /** @return \BackedEnum status disetujui namun belum ditindaklanjuti (masih boleh dibatalkan dengan alasan) */
+    abstract protected function approvedStatus(): \BackedEnum;
+
+    /** Permission petugas yang menindaklanjuti permintaan disetujui (mis. "assignment.handover"). */
+    abstract protected function fulfillPermission(): string;
+
     public function view(User $user, Model $request): bool
     {
         return $request->isVisibleTo($user);
@@ -37,8 +43,16 @@ abstract class RequestPolicy
             && $user->hasPermission($this->createPermission());
     }
 
+    /**
+     * Draft/menunggu approval: hanya requester. Sudah disetujui tapi belum ditindaklanjuti:
+     * requester atau petugas penindak lanjut (alasan wajib, dicek di service).
+     */
     public function cancel(User $user, Model $request): bool
     {
+        if ($request->status === $this->approvedStatus()) {
+            return $request->isOwnedBy($user) || $user->hasPermission($this->fulfillPermission());
+        }
+
         return in_array($request->status, $this->cancellableStatuses(), true)
             && $request->isOwnedBy($user);
     }

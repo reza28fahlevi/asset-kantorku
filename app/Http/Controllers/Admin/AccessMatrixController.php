@@ -52,6 +52,8 @@ class AccessMatrixController extends Controller
             }
         });
 
-        return redirect()->route('admin.access.index')->with('success', 'Matriks otorisasi berhasil disimpan.');
+        return $this->reassignApprovals(
+            redirect()->route('admin.access.index')->with('success', 'Matriks otorisasi berhasil disimpan.')
+        );
     }
 }

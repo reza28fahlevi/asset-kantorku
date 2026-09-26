@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'request_no', 'approval_request_id', 'asset_id', 'requester_employee_id', 'created_by_user_id',
     'reason_type', 'reason', 'condition_description', 'planned_method', 'status', 'asset_status_before',
-    'submitted_at', 'cancelled_at', 'executed_at', 'executed_by_user_id', 'actual_method',
+    'submitted_at', 'cancelled_at', 'cancel_reason', 'cancelled_by_user_id', 'executed_at', 'executed_by_user_id', 'actual_method',
     'disposal_recipient', 'proceeds_amount', 'execution_notes', 'completed_at',
 ])]
 class DisposalRequest extends Model implements Approvable
@@ -85,5 +85,10 @@ class DisposalRequest extends Model implements Approvable
     public function approvalUrl(): string
     {
         return route('disposals.show', $this);
+    }
+
+    public function cancelledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by_user_id');
     }
 }

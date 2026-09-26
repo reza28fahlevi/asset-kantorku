@@ -33,7 +33,7 @@ class SettingController extends Controller
         $old = Setting::query()->pluck('value', 'key')->all();
         $new = [
             'app.company_name' => $data['app_company_name'],
-            'approval.escalation_employee_id' => $data['approval_escalation_employee_id'],
+            'approval.escalation_employee_id' => $data['approval_escalation_employee_id'] ?? null,
             'loan.max_duration_days' => (string) $data['loan_max_duration_days'],
             'attachment.max_size_kb' => (string) $data['attachment_max_size_kb'],
         ];

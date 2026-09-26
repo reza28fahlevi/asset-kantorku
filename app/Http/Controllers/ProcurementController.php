@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Support\Like;
 
 class ProcurementController extends Controller
 {
@@ -35,7 +36,7 @@ class ProcurementController extends Controller
         $base = ProcurementRequest::query()
             ->visibleTo($request->user())
             ->when($request->query('q'), function ($q, $t) {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $t).'%';
+                $like = Like::contains($t);
                 $q->where(fn ($w) => $w
                     ->where('request_no', 'ilike', $like)
                     ->orWhere('title', 'ilike', $like)
@@ -143,10 +144,11 @@ class ProcurementController extends Controller
         return back()->with('success', "{$procurement->request_no} berhasil diajukan.");
     }
 
-    public function cancel(ProcurementRequest $procurement): RedirectResponse
+    public function cancel(Request $request, ProcurementRequest $procurement): RedirectResponse
     {
         $this->authorize('cancel', $procurement);
-        $this->service->cancel($procurement);
+        $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
+        $this->service->cancel($procurement, $request->user(), $data['cancel_reason'] ?? null);
 
         return back()->with('success', "{$procurement->request_no} dibatalkan.");
     }

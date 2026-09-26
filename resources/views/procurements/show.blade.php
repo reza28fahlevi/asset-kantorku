@@ -31,9 +31,7 @@
         </a>
     @endcan
     @can('cancel', $procurement)
-        <x-confirm-form :action="route('procurements.cancel', $procurement)" method="POST" confirm="Batalkan permintaan pengadaan ini?" button="btn btn-danger">
-            <span class="material-symbols-outlined !text-[18px]">cancel</span> Batalkan
-        </x-confirm-form>
+        <x-cancel-request :action="route('procurements.cancel', $procurement)" :approved="$procurement->status === \App\Enums\ProcurementStatus::Approved" label="permintaan pengadaan"/>
     @endcan
 @endsection
 
@@ -52,7 +50,7 @@
                 <dt>Diajukan</dt><dd>{{ $procurement->submitted_at?->format('d M Y H:i') ?? '-' }}</dd>
                 <dt>Justifikasi</dt><dd class="whitespace-pre-line">{{ $procurement->justification }}</dd>
                 @if ($procurement->cancelled_at)
-                    <dt>Dibatalkan</dt><dd>{{ $procurement->cancelled_at->format('d M Y H:i') }}</dd>
+                    <dt>Dibatalkan</dt><dd>{{ $procurement->cancelled_at->format('d M Y H:i') }}@if ($procurement->cancelledBy) · {{ $procurement->cancelledBy->name }}@endif</dd>@if ($procurement->cancel_reason)<dt>Alasan Batal</dt><dd>{{ $procurement->cancel_reason }}</dd>@endif
                 @endif
                 @if ($procurement->completed_at)
                     <dt>Selesai</dt><dd>{{ $procurement->completed_at->format('d M Y H:i') }}</dd>

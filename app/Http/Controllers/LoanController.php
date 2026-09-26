@@ -18,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Support\Like;
 
 class LoanController extends Controller
 {
@@ -37,7 +38,7 @@ class LoanController extends Controller
         $base = AssetLoanRequest::query()
             ->visibleTo($request->user())
             ->when($request->query('q'), function ($q, $t) {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $t).'%';
+                $like = Like::contains($t);
                 $q->where(fn ($w) => $w
                     ->where('request_no', 'ilike', $like)
                     ->orWhereHas('requester', fn ($e) => $e->where('name', 'ilike', $like))
@@ -152,10 +153,11 @@ class LoanController extends Controller
         return back()->with('success', "{$loan->request_no} berhasil diajukan.");
     }
 
-    public function cancel(AssetLoanRequest $loan): RedirectResponse
+    public function cancel(Request $request, AssetLoanRequest $loan): RedirectResponse
     {
         $this->authorize('cancel', $loan);
-        $this->service->cancel($loan);
+        $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
+        $this->service->cancel($loan, $request->user(), $data['cancel_reason'] ?? null);
 
         return back()->with('success', "{$loan->request_no} dibatalkan.");
     }

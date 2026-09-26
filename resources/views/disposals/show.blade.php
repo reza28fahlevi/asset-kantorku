@@ -16,9 +16,7 @@
         </x-confirm-form>
     @endcan
     @can('cancel', $disposal)
-        <x-confirm-form :action="route('disposals.cancel', $disposal)" method="POST" confirm="Batalkan permintaan disposal ini?" button="btn btn-danger">
-            Batalkan
-        </x-confirm-form>
+        <x-cancel-request :action="route('disposals.cancel', $disposal)" :approved="$disposal->status === \App\Enums\DisposalStatus::Approved" label="permintaan disposal"/>
     @endcan
 @endsection
 
@@ -38,7 +36,7 @@
                 <dt>Dibuat</dt><dd>{{ $disposal->created_at?->format('d M Y H:i') }}</dd>
                 <dt>Diajukan</dt><dd>{{ $disposal->submitted_at?->format('d M Y H:i') ?? '-' }}</dd>
                 @if ($disposal->cancelled_at)
-                    <dt>Dibatalkan</dt><dd>{{ $disposal->cancelled_at->format('d M Y H:i') }}</dd>
+                    <dt>Dibatalkan</dt><dd>{{ $disposal->cancelled_at->format('d M Y H:i') }}@if ($disposal->cancelledBy) · {{ $disposal->cancelledBy->name }}@endif</dd>@if ($disposal->cancel_reason)<dt>Alasan Batal</dt><dd>{{ $disposal->cancel_reason }}</dd>@endif
                 @endif
             </dl>
         </x-card>

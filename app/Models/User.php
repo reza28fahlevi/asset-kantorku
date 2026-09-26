@@ -74,6 +74,10 @@ class User extends Authenticatable
     /** User dapat bertindak sebagai approver bila aktif, tertaut karyawan, dan memiliki permission approval. */
     public function isApprover(): bool
     {
-        return $this->is_active && $this->employee_id !== null && $this->hasPermission('approval.decide');
+        // Wajib: akun aktif, tertaut karyawan yang status kepegawaiannya AKTIF, dan punya permission approval
+        return $this->is_active
+            && $this->employee_id !== null
+            && $this->employee?->isActive() === true
+            && $this->hasPermission('approval.decide');
     }
 }

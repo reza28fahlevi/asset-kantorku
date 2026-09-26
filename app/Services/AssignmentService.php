@@ -77,14 +77,23 @@ class AssignmentService implements ApprovalHandler
         });
     }
 
-    public function cancel(AssignmentRequest $request): void
+
+    /**
+     * Status yang boleh dibatalkan: draft & menunggu approval, atau sudah disetujui namun belum
+     * ditindaklanjuti. Pembatalan setelah disetujui wajib beralasan, tercatat di audit log, dan
+     * requester diberi tahu bila dibatalkan oleh petugas.
+     */
+    public function cancel(AssignmentRequest $request, ?User $user = null, ?string $reason = null): void
     {
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $user, $reason) {
             $request = AssignmentRequest::whereKey($request->id)->lockForUpdate()->firstOrFail();
-            $this->ensureStatus($request->status, [RequestStatus::Draft, RequestStatus::PendingApproval], 'membatalkan assignment');
+            $this->ensureStatus($request->status, [RequestStatus::Draft, RequestStatus::PendingApproval, RequestStatus::Approved], 'membatalkan assignment');
+            $wasApproved = $request->status === RequestStatus::Approved;
+            $reason = $this->cancelReason($wasApproved, $reason);
 
             $this->approvals->cancel($request->approvalRequest);
-            $request->update(['status' => RequestStatus::Cancelled, 'cancelled_at' => now()]);
+            $request->update(['status' => RequestStatus::Cancelled, 'cancelled_at' => now(), 'cancel_reason' => $reason, 'cancelled_by_user_id' => $user?->id]);
+            $this->afterCancel($request, $wasApproved, $user, $reason, route('assignments.show', $request));
         });
     }
 

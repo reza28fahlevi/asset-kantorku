@@ -23,6 +23,16 @@ class ProcurementRequestPolicy extends RequestPolicy
         return ProcurementStatus::Draft;
     }
 
+    protected function approvedStatus(): \BackedEnum
+    {
+        return ProcurementStatus::Approved;
+    }
+
+    protected function fulfillPermission(): string
+    {
+        return 'procurement.order';
+    }
+
     /** Draft hanya dapat diubah oleh pemiliknya. */
     public function update(User $user, ProcurementRequest $request): bool
     {

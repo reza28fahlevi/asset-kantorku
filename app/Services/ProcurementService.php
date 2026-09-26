@@ -119,14 +119,23 @@ class ProcurementService implements ApprovalHandler
         });
     }
 
-    public function cancel(ProcurementRequest $request): void
+
+    /**
+     * Status yang boleh dibatalkan: draft & menunggu approval, atau sudah disetujui namun belum
+     * ditindaklanjuti. Pembatalan setelah disetujui wajib beralasan, tercatat di audit log, dan
+     * requester diberi tahu bila dibatalkan oleh petugas.
+     */
+    public function cancel(ProcurementRequest $request, ?User $user = null, ?string $reason = null): void
     {
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $user, $reason) {
             $request = ProcurementRequest::whereKey($request->id)->lockForUpdate()->firstOrFail();
-            $this->ensureStatus($request->status, [ProcurementStatus::Draft, ProcurementStatus::PendingApproval], 'membatalkan procurement');
+            $this->ensureStatus($request->status, [ProcurementStatus::Draft, ProcurementStatus::PendingApproval, ProcurementStatus::Approved], 'membatalkan procurement');
+            $wasApproved = $request->status === ProcurementStatus::Approved;
+            $reason = $this->cancelReason($wasApproved, $reason);
 
             $this->approvals->cancel($request->approvalRequest);
-            $request->update(['status' => ProcurementStatus::Cancelled, 'cancelled_at' => now()]);
+            $request->update(['status' => ProcurementStatus::Cancelled, 'cancelled_at' => now(), 'cancel_reason' => $reason, 'cancelled_by_user_id' => $user?->id]);
+            $this->afterCancel($request, $wasApproved, $user, $reason, route('procurements.show', $request));
         });
     }
 
@@ -201,6 +210,10 @@ class ProcurementService implements ApprovalHandler
 
                 if ($accepted > $item->remainingQuantity()) {
                     throw new BusinessRuleException("Jumlah diterima untuk \"{$item->item_name}\" melebihi sisa ({$item->remainingQuantity()} unit).");
+                }
+                // Unit yang datang dalam satu pengiriman (diterima + ditolak) tidak boleh melebihi sisa pesanan
+                if ($accepted + $rejected > $item->remainingQuantity()) {
+                    throw new BusinessRuleException("Jumlah diterima + ditolak untuk \"{$item->item_name}\" ({$accepted} + {$rejected}) melebihi sisa pesanan ({$item->remainingQuantity()} unit).");
                 }
 
                 $serials = collect(preg_split('/\r\n|\r|\n|,/', (string) ($line['serial_numbers'] ?? '')))
