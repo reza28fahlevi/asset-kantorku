@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('/', DashboardController::class)->middleware('permission:dashboard.view')->name('dashboard');
+    Route::get('/dashboard/widgets/{widget}', [DashboardController::class, 'widget'])->middleware('permission:dashboard.view')->name('dashboard.widget');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');

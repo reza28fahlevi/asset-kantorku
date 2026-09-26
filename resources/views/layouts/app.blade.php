@@ -62,6 +62,7 @@
 <html lang="id">
 <head>
     @include('layouts.partials.head')
+    <script src="{{ asset('js/ajax-nav.js') }}?v=1"></script>
     @stack('head')
     {{-- Terapkan status sidebar tersembunyi sebelum Alpine aktif agar tidak berkedip saat halaman dimuat --}}
     <script>try { if (localStorage.getItem('sidebar-hidden') === '1') document.documentElement.classList.add('sb-hidden'); } catch (e) {}</script>
@@ -250,7 +251,9 @@
     <footer class="px-gutter py-space-md text-label-sm font-normal text-outline border-t border-border-subtle">
         &copy; {{ date('Y') }} {{ config('app.name', 'AssetKu') }} — Sistem Manajemen Aset Kantor
     </footer>
+    {{-- Script halaman berada di dalam #app-content agar ikut dijalankan ulang saat navigasi AJAX --}}
+    <div id="page-scripts" hidden>@stack('scripts')</div>
 </div>
-@stack('scripts')
+<div id="nav-progress" class="fixed top-0 left-0 h-0.5 bg-secondary-container z-[60] opacity-0 transition-all duration-300" style="width:0"></div>
 </body>
 </html>
