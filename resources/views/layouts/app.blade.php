@@ -63,11 +63,41 @@
 <head>
     @include('layouts.partials.head')
     @stack('head')
+    {{-- Terapkan status sidebar tersembunyi sebelum Alpine aktif agar tidak berkedip saat halaman dimuat --}}
+    <script>try { if (localStorage.getItem('sidebar-hidden') === '1') document.documentElement.classList.add('sb-hidden'); } catch (e) {}</script>
+    <style>
+        #app-sidebar { transform: translateX(-100%); transition: transform .3s ease; }
+        #app-sidebar.is-open { transform: none; }
+        #app-content { transition: padding-left .3s ease; }
+        @media (min-width: 1024px) {
+            #app-sidebar { transform: none; }
+            #app-content { padding-left: 16rem; }
+            html.sb-hidden #app-sidebar { transform: translateX(-100%); }
+            html.sb-hidden #app-content { padding-left: 0; }
+        }
+    </style>
 </head>
-<body class="bg-surface-canvas font-sans text-body-md text-on-surface antialiased" x-data="{ sidebar: false }">
+<body class="bg-surface-canvas font-sans text-body-md text-on-surface antialiased" x-data="sidebarState()" @keydown.ctrl.b.window.prevent="toggleSidebar()">
+<script>
+    // Sidebar: 'sidebar' = drawer mobile; 'hidden' = sembunyikan sidebar di desktop (diingat per browser)
+    function sidebarState() {
+        let hidden = false;
+        try { hidden = localStorage.getItem('sidebar-hidden') === '1'; } catch (e) {}
+        return {
+            sidebar: false,
+            hidden: hidden,
+            toggleSidebar() {
+                if (window.innerWidth < 1024) { this.sidebar = !this.sidebar; return; }
+                this.hidden = !this.hidden;
+                document.documentElement.classList.toggle('sb-hidden', this.hidden);
+                try { localStorage.setItem('sidebar-hidden', this.hidden ? '1' : '0'); } catch (e) {}
+            },
+        };
+    }
+</script>
 {{-- Sidebar --}}
 <div x-cloak x-show="sidebar" @click="sidebar = false" class="fixed inset-0 bg-black/40 z-40 lg:hidden"></div>
-<aside :class="sidebar ? 'translate-x-0' : ''" class="fixed left-0 top-0 h-full w-64 bg-primary-container z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.08)] transition-transform -translate-x-full lg:translate-x-0">
+<aside id="app-sidebar" :class="sidebar && 'is-open'" class="fixed left-0 top-0 h-full w-64 bg-primary-container z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
     <a href="{{ route('dashboard') }}" class="h-16 px-space-md flex items-center gap-space-sm bg-tertiary-container shrink-0">
         <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-8 w-8"/>
         <div class="flex flex-col">
@@ -127,11 +157,15 @@
     </div>
 </aside>
 
-<div class="lg:pl-64 flex flex-col min-h-screen">
+<div id="app-content" class="flex flex-col min-h-screen">
     {{-- Topbar --}}
     <header class="sticky top-0 h-16 bg-surface-card/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-30 flex items-center justify-between px-gutter gap-space-md">
         <div class="flex items-center gap-space-md min-w-0">
-            <button type="button" @click="sidebar = true" class="lg:hidden p-space-xs text-on-surface-variant hover:bg-surface-subtle rounded"><span class="material-symbols-outlined">menu</span></button>
+            <button type="button" @click="toggleSidebar()" class="p-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle rounded"
+                    :title="hidden ? 'Tampilkan sidebar (Ctrl+B)' : 'Sembunyikan sidebar (Ctrl+B)'" aria-label="Tampilkan/sembunyikan sidebar">
+                <span class="material-symbols-outlined lg:hidden">menu</span>
+                <span class="material-symbols-outlined hidden lg:inline" x-text="hidden ? 'menu' : 'menu_open'">menu_open</span>
+            </button>
             @permission('asset.view')
                 <form action="{{ route('assets.index') }}" method="GET" class="relative hidden md:flex items-center">
                     <span class="material-symbols-outlined absolute left-space-md text-outline !text-[18px]">search</span>
