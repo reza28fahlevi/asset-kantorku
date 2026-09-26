@@ -68,7 +68,7 @@
     <a href="{{ route('dashboard') }}" class="h-16 px-space-md flex items-center gap-space-sm bg-tertiary-container shrink-0">
         <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-8 w-8"/>
         <div class="flex flex-col">
-            <span class="text-title-md text-on-primary font-bold tracking-tight leading-tight">AssetPro</span>
+            <span class="text-title-md text-on-primary font-bold tracking-tight leading-tight">AssetKu</span>
             <span class="text-label-sm text-on-primary-container uppercase tracking-wider">Enterprise</span>
         </div>
     </a>
@@ -120,7 +120,7 @@
         @endforeach
     </nav>
     <div class="p-space-md bg-tertiary-container text-center">
-        <span class="text-label-sm text-on-tertiary-container">{{ config('app.name', 'AssetPro') }} · Enterprise Edition</span>
+        <span class="text-label-sm text-on-tertiary-container">{{ config('app.name', 'AssetKu') }} · Enterprise Edition</span>
     </div>
 </aside>
 
@@ -211,7 +211,7 @@
         @yield('content')
     </main>
     <footer class="px-gutter py-space-md text-label-sm font-normal text-outline border-t border-border-subtle">
-        &copy; {{ date('Y') }} {{ config('app.name', 'AssetPro') }} — Sistem Manajemen Aset Kantor
+        &copy; {{ date('Y') }} {{ config('app.name', 'AssetKu') }} — Sistem Manajemen Aset Kantor
     </footer>
 </div>
 @stack('scripts')
