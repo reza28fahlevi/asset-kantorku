@@ -22,18 +22,45 @@ class DisposalController extends Controller
 
     public function index(Request $request): View
     {
-        $requests = DisposalRequest::query()
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date'],
+            'department_id' => ['nullable', 'integer'],
+        ]);
+
+        // Cakupan dasar (visibilitas + pencarian + tanggal + departemen aset), tanpa filter status
+        $base = DisposalRequest::query()
             ->visibleTo($request->user())
-            ->with('requester', 'asset.category')
+            ->when($request->query('q'), function ($q, $t) {
+                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $t).'%';
+                $q->where(fn ($w) => $w
+                    ->where('request_no', 'ilike', $like)
+                    ->orWhereHas('asset', fn ($a) => $a->search($t))
+                    ->orWhereHas('requester', fn ($e) => $e->where('name', 'ilike', $like)));
+            })
+            ->when($request->query('from'), fn ($q, $d) => $q->whereDate('created_at', '>=', $d))
+            ->when($request->query('to'), fn ($q, $d) => $q->whereDate('created_at', '<=', $d))
+            ->when($request->query('department_id'), fn ($q, $d) => $q->whereHas('asset', fn ($a) => $a->where('department_id', $d)));
+
+        $statusCounts = (clone $base)->toBase()
+            ->selectRaw('status, count(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status')
+            ->map(fn ($c) => (int) $c);
+
+        $requests = (clone $base)
+            ->with('requester', 'asset.category', 'asset.department')
             ->when($request->query('status'), fn ($q, $s) => $q->where('status', $s))
-            ->when($request->query('q'), fn ($q, $t) => $q->where(fn ($w) => $w
-                ->where('request_no', 'ilike', "%{$t}%")
-                ->orWhereHas('asset', fn ($a) => $a->search($t))))
             ->orderByDesc('id')
             ->paginate(15)
             ->withQueryString();
 
-        return view('disposals.index', ['requests' => $requests]);
+        return view('disposals.index', [
+            'requests' => $requests,
+            'statusCounts' => $statusCounts,
+            'totalCount' => $statusCounts->sum(),
+            'departments' => \App\Models\Department::active()->orderBy('name')->get(),
+        ]);
     }
 
     public function create(Request $request): View

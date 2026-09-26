@@ -1,57 +1,125 @@
 @extends('layouts.app')
-@section('title', 'Permintaan Penugasan Aset')
-@section('subtitle', 'Daftar permintaan penugasan aset ke karyawan beserta status approval.')
+@section('title', 'Daftar Pengajuan Serah Terima')
+@section('subtitle', 'Daftar permintaan penugasan / serah terima aset ke karyawan beserta status approval.')
 @section('breadcrumb')
-    <span class="material-symbols-outlined !text-[14px]">chevron_right</span><span class="text-on-surface font-semibold">Penugasan</span>
+    <span class="material-symbols-outlined !text-[14px]">chevron_right</span><span class="text-on-surface font-semibold">Serah Terima</span>
 @endsection
 @section('actions')
     <a href="{{ route('assignments.active') }}" class="btn btn-secondary"><span class="material-symbols-outlined !text-[18px]">assignment_ind</span> Penugasan Aktif</a>
     @can('create', App\Models\AssignmentRequest::class)
-        <a href="{{ route('assignments.create') }}" class="btn btn-primary"><span class="material-symbols-outlined !text-[18px]">add</span> Buat Permintaan</a>
+        <a href="{{ route('assignments.create') }}" class="btn btn-primary"><span class="material-symbols-outlined !text-[18px]">add</span> Ajukan Serah Terima</a>
     @endcan
 @endsection
+
+@use('App\Enums\RequestStatus')
+@php
+    $currentStatus = request('status');
+    $statusUrl = fn ($value) => request()->fullUrlWithQuery(['status' => $value, 'page' => null]);
+    $hasFilter = request()->hasAny(['q', 'status', 'from', 'to', 'department_id']);
+@endphp
+
 @section('content')
-<x-card :padding="false">
-    <form method="GET" class="flex flex-wrap items-end gap-space-md px-space-lg py-space-md border-b border-border-subtle">
-        <div class="flex-1 min-w-[200px]">
-            <label class="form-label">Nomor Permintaan</label>
-            <input type="search" name="q" value="{{ request('q') }}" class="form-input" placeholder="Cari nomor permintaan...">
-        </div>
-        <div class="w-56">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-input">
-                <option value="">Semua status</option>
-                @foreach (App\Enums\RequestStatus::cases() as $s)
-                    <option value="{{ $s->value }}" @selected(request('status') === $s->value)>{{ $s->label() }}</option>
-                @endforeach
-            </select>
-        </div>
-        <button class="btn btn-secondary"><span class="material-symbols-outlined !text-[18px]">filter_list</span> Filter</button>
-        @if (request()->hasAny(['q', 'status']))<a href="{{ route('assignments.index') }}" class="btn btn-ghost">Reset</a>@endif
-    </form>
-    @if ($requests->isEmpty())
-        <x-empty icon="assignment" message="Belum ada permintaan penugasan." />
-    @else
-        <div class="overflow-x-auto">
-            <table class="table">
-                <thead><tr><th>No. Permintaan</th><th>Penerima</th><th>Lokasi</th><th>Tgl Mulai</th><th class="text-center">Jml Aset</th><th>Pemohon</th><th>Status</th><th></th></tr></thead>
-                <tbody>
-                @foreach ($requests as $r)
-                    <tr>
-                        <td><a href="{{ route('assignments.show', $r) }}" class="font-semibold text-secondary hover:underline">{{ $r->request_no }}</a></td>
-                        <td>{{ $r->recipient?->name ?? '-' }}</td>
-                        <td>{{ $r->location?->name ?? '-' }}</td>
-                        <td>{{ $r->start_date?->format('d M Y') }}</td>
-                        <td class="text-center">{{ $r->assets_count }}</td>
-                        <td>{{ $r->requester?->name ?? '-' }}</td>
-                        <td><x-badge :enum="$r->status" /></td>
-                        <td class="text-right"><a href="{{ route('assignments.show', $r) }}" class="btn btn-ghost btn-sm">Detail</a></td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="px-space-lg py-space-md border-t border-border-subtle">{{ $requests->links() }}</div>
-    @endif
-</x-card>
+<div class="space-y-space-lg">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+        <x-stat label="Total Pengajuan" :value="number_format($totalCount, 0, ',', '.')" icon="assignment" color="neutral" :href="$statusUrl(null)" hint="Sesuai cakupan & filter"/>
+        <x-stat label="Menunggu Approval" :value="number_format($statusCounts[RequestStatus::PendingApproval->value] ?? 0, 0, ',', '.')" icon="hourglass_top" color="pending" :href="$statusUrl(RequestStatus::PendingApproval->value)"/>
+        <x-stat label="Siap Serah Terima" :value="number_format($statusCounts[RequestStatus::Approved->value] ?? 0, 0, ',', '.')" icon="handshake" color="assigned" :href="$statusUrl(RequestStatus::Approved->value)" hint="Disetujui, menunggu handover"/>
+        <x-stat label="Selesai" :value="number_format($statusCounts[RequestStatus::Fulfilled->value] ?? 0, 0, ',', '.')" icon="task_alt" color="available" :href="$statusUrl(RequestStatus::Fulfilled->value)"/>
+    </div>
+
+    <div class="card px-space-md py-space-sm flex flex-wrap items-center gap-space-xs">
+        <a href="{{ $statusUrl(null) }}" @class(['btn btn-sm', 'btn-primary' => ! $currentStatus, 'btn-ghost' => $currentStatus])>
+            Semua <span class="tag">{{ $totalCount }}</span>
+        </a>
+        @foreach (RequestStatus::cases() as $s)
+            <a href="{{ $statusUrl($s->value) }}" @class(['btn btn-sm', 'btn-primary' => $currentStatus === $s->value, 'btn-ghost' => $currentStatus !== $s->value])>
+                {{ $s->label() }} <span class="tag">{{ $statusCounts[$s->value] ?? 0 }}</span>
+            </a>
+        @endforeach
+    </div>
+
+    <x-card title="Daftar Pengajuan Serah Terima" icon="assignment" :padding="false">
+        <form method="GET" class="flex flex-wrap items-end gap-space-sm px-space-lg py-space-md border-b border-border-subtle">
+            <div class="flex-1 min-w-[220px]">
+                <label class="form-label" for="q">Cari</label>
+                <input type="search" id="q" name="q" value="{{ request('q') }}" class="form-input" placeholder="No. permintaan, pemohon, penerima, tag aset...">
+            </div>
+            <div class="w-48">
+                <label class="form-label" for="status">Status</label>
+                <select id="status" name="status" class="form-input">
+                    <option value="">Semua status</option>
+                    @foreach (RequestStatus::cases() as $s)
+                        <option value="{{ $s->value }}" @selected($currentStatus === $s->value)>{{ $s->label() }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="w-52">
+                <label class="form-label" for="department_id">Departemen Penerima</label>
+                <select id="department_id" name="department_id" class="form-input">
+                    <option value="">Semua departemen</option>
+                    @foreach ($departments as $d)
+                        <option value="{{ $d->id }}" @selected((string) request('department_id') === (string) $d->id)>{{ $d->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="w-40">
+                <label class="form-label" for="from">Dibuat dari</label>
+                <input type="date" id="from" name="from" value="{{ request('from') }}" class="form-input">
+            </div>
+            <div class="w-40">
+                <label class="form-label" for="to">Sampai</label>
+                <input type="date" id="to" name="to" value="{{ request('to') }}" class="form-input">
+            </div>
+            <button class="btn btn-secondary"><span class="material-symbols-outlined !text-[18px]">filter_list</span> Filter</button>
+            @if ($hasFilter)<a href="{{ route('assignments.index') }}" class="btn btn-ghost"><span class="material-symbols-outlined !text-[18px]">filter_alt_off</span> Reset</a>@endif
+        </form>
+
+        @if ($requests->isEmpty())
+            <x-empty icon="assignment" :message="$hasFilter ? 'Tidak ada pengajuan serah terima yang sesuai filter.' : 'Belum ada pengajuan serah terima.'">
+                @can('create', App\Models\AssignmentRequest::class)
+                    <a href="{{ route('assignments.create') }}" class="btn btn-primary btn-sm mt-space-md"><span class="material-symbols-outlined !text-[18px]">add</span> Ajukan Serah Terima</a>
+                @endcan
+            </x-empty>
+        @else
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>No. Permintaan</th>
+                            <th>Tujuan</th>
+                            <th>Penerima / Departemen</th>
+                            <th>Pemohon</th>
+                            <th>Lokasi</th>
+                            <th class="text-center">Jml Aset</th>
+                            <th>Tgl Mulai</th>
+                            <th>Status</th>
+                            <th>Dibuat</th>
+                            <th class="text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($requests as $r)
+                        <tr>
+                            <td><a href="{{ route('assignments.show', $r) }}" class="font-mono font-semibold text-secondary hover:underline whitespace-nowrap">{{ $r->request_no }}</a></td>
+                            <td class="max-w-[260px]"><p class="line-clamp-2">{{ \Illuminate\Support\Str::limit($r->purpose, 120) }}</p></td>
+                            <td>
+                                <p>{{ $r->recipient?->name ?? '-' }}</p>
+                                <p class="text-label-sm font-normal text-outline">{{ $r->recipient?->department?->name ?? '-' }}</p>
+                            </td>
+                            <td>{{ $r->requester?->name ?? '-' }}</td>
+                            <td>{{ $r->location?->name ?? '-' }}</td>
+                            <td class="text-center">{{ $r->assets_count }}</td>
+                            <td class="whitespace-nowrap">{{ $r->start_date?->format('d M Y') ?? '-' }}</td>
+                            <td><x-badge :enum="$r->status" /></td>
+                            <td class="whitespace-nowrap text-on-surface-variant">{{ $r->created_at?->format('d M Y') }}</td>
+                            <td class="text-right"><a href="{{ route('assignments.show', $r) }}" class="btn btn-ghost btn-sm">Detail</a></td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-space-lg py-space-md border-t border-border-subtle">{{ $requests->links() }}</div>
+        @endif
+    </x-card>
+</div>
 @endsection

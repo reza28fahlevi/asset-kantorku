@@ -25,18 +25,49 @@ class ProcurementController extends Controller
 
     public function index(Request $request): View
     {
-        $requests = ProcurementRequest::query()
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date'],
+            'department_id' => ['nullable', 'integer'],
+        ]);
+
+        // Cakupan dasar (visibilitas + pencarian + tanggal + departemen), tanpa filter status
+        $base = ProcurementRequest::query()
             ->visibleTo($request->user())
+            ->when($request->query('q'), function ($q, $t) {
+                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $t).'%';
+                $q->where(fn ($w) => $w
+                    ->where('request_no', 'ilike', $like)
+                    ->orWhere('title', 'ilike', $like)
+                    ->orWhereHas('requester', fn ($e) => $e->where('name', 'ilike', $like)));
+            })
+            ->when($request->query('from'), fn ($q, $d) => $q->whereDate('created_at', '>=', $d))
+            ->when($request->query('to'), fn ($q, $d) => $q->whereDate('created_at', '<=', $d))
+            ->when($request->query('department_id'), fn ($q, $d) => $q->where('department_id', $d));
+
+        $statusCounts = (clone $base)->toBase()
+            ->selectRaw('status, count(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status')
+            ->map(fn ($c) => (int) $c);
+
+        $status = $request->query('status');
+        $requests = (clone $base)
             ->with('requester', 'department')
             ->withSum('items', 'quantity')
-            ->when($request->query('status'), fn ($q, $s) => $q->where('status', $s))
-            ->when($request->query('q'), fn ($q, $t) => $q->where(fn ($w) => $w
-                ->where('request_no', 'ilike', "%{$t}%")->orWhere('title', 'ilike', "%{$t}%")))
+            ->withCount('items')
+            ->when($status, fn ($q, $s) => $q->where('status', $s))
             ->orderByDesc('id')
             ->paginate(15)
             ->withQueryString();
 
-        return view('procurements.index', ['requests' => $requests]);
+        return view('procurements.index', [
+            'requests' => $requests,
+            'statusCounts' => $statusCounts,
+            'totalCount' => $statusCounts->sum(),
+            'totalValue' => (float) (clone $base)->when($status, fn ($q, $s) => $q->where('status', $s))->sum('estimated_total'),
+            'departments' => Department::active()->orderBy('name')->get(),
+        ]);
     }
 
     public function create(Request $request): View

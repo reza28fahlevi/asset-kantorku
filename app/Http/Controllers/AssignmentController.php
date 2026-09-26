@@ -24,17 +24,47 @@ class AssignmentController extends Controller
 
     public function index(Request $request): View
     {
-        $requests = AssignmentRequest::query()
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date'],
+            'department_id' => ['nullable', 'integer'],
+        ]);
+
+        // Cakupan dasar (visibilitas + pencarian + tanggal + departemen penerima), tanpa filter status
+        $base = AssignmentRequest::query()
             ->visibleTo($request->user())
-            ->with('requester', 'recipient', 'location')
+            ->when($request->query('q'), function ($q, $t) {
+                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $t).'%';
+                $q->where(fn ($w) => $w
+                    ->where('request_no', 'ilike', $like)
+                    ->orWhereHas('requester', fn ($e) => $e->where('name', 'ilike', $like))
+                    ->orWhereHas('recipient', fn ($e) => $e->where('name', 'ilike', $like))
+                    ->orWhereHas('assets', fn ($a) => $a->search($t)));
+            })
+            ->when($request->query('from'), fn ($q, $d) => $q->whereDate('created_at', '>=', $d))
+            ->when($request->query('to'), fn ($q, $d) => $q->whereDate('created_at', '<=', $d))
+            ->when($request->query('department_id'), fn ($q, $d) => $q->whereHas('recipient', fn ($e) => $e->where('department_id', $d)));
+
+        $statusCounts = (clone $base)->toBase()
+            ->selectRaw('status, count(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status')
+            ->map(fn ($c) => (int) $c);
+
+        $requests = (clone $base)
+            ->with('requester', 'recipient.department', 'location')
             ->withCount('assets')
             ->when($request->query('status'), fn ($q, $s) => $q->where('status', $s))
-            ->when($request->query('q'), fn ($q, $t) => $q->where('request_no', 'ilike', "%{$t}%"))
             ->orderByDesc('id')
             ->paginate(15)
             ->withQueryString();
 
-        return view('assignments.index', ['requests' => $requests]);
+        return view('assignments.index', [
+            'requests' => $requests,
+            'statusCounts' => $statusCounts,
+            'totalCount' => $statusCounts->sum(),
+            'departments' => \App\Models\Department::active()->orderBy('name')->get(),
+        ]);
     }
 
     /** Daftar assignment aktif (aset yang sedang dipegang karyawan). */
