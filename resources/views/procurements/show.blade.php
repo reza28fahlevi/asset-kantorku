@@ -15,6 +15,11 @@
 @endphp
 
 @section('actions')
+    @can('update', $procurement)
+        <a href="{{ route('procurements.edit', $procurement) }}" class="btn btn-secondary">
+            <span class="material-symbols-outlined !text-[18px]">edit</span> Lengkapi Draft
+        </a>
+    @endcan
     @can('submit', $procurement)
         <x-confirm-form :action="route('procurements.submit', $procurement)" method="POST" confirm="Ajukan permintaan ini untuk approval? Setelah diajukan data tidak dapat diubah." button="btn btn-primary">
             <span class="material-symbols-outlined !text-[18px]">send</span> Ajukan

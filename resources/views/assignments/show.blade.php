@@ -134,13 +134,7 @@
             </x-card>
         @endcan
 
-        <x-card title="Alur Approval" icon="approval">
-            @if ($assignment->approvalRequest)
-                <x-approval-timeline :approval="$assignment->approvalRequest" />
-            @else
-                <p class="text-body-sm text-on-surface-variant">Belum diajukan untuk approval.</p>
-            @endif
-        </x-card>
+        <x-approval-timeline :approval="$assignment->approvalRequest" />
     </div>
 </div>
 @endsection

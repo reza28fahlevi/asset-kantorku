@@ -1,17 +1,21 @@
 @extends('layouts.app')
 
-@section('title', 'Pengajuan Pengadaan Aset')
+@php $procurement ??= null; $editing = (bool) $procurement; @endphp
+@section('title', $editing ? 'Lengkapi Draft '.$procurement->request_no : 'Pengajuan Pengadaan Aset')
 @section('subtitle', 'Lengkapi kebutuhan, rincian barang, dan dokumen penawaran untuk diajukan ke alur persetujuan.')
 
 @section('breadcrumb')
     <span class="material-symbols-outlined !text-[14px]">chevron_right</span>
     <a href="{{ route('procurements.index') }}" class="hover:text-on-surface">Procurement</a>
     <span class="material-symbols-outlined !text-[14px]">chevron_right</span>
-    <span class="text-on-surface font-semibold">Pengadaan Baru</span>
+    <span class="text-on-surface font-semibold">{{ $editing ? 'Edit Draft' : 'Pengadaan Baru' }}</span>
 @endsection
 
 @php
-    $oldItems = old('items', [['asset_category_id' => '', 'item_name' => '', 'specification' => '', 'quantity' => 1, 'estimated_unit_price' => 0]]);
+    $defaultItems = $editing && $procurement->items->isNotEmpty()
+        ? $procurement->items->map->only(['asset_category_id', 'item_name', 'specification', 'quantity', 'estimated_unit_price'])->all()
+        : [['asset_category_id' => '', 'item_name' => '', 'specification' => '', 'quantity' => 1, 'estimated_unit_price' => 0]];
+    $oldItems = old('items', $defaultItems);
     $oldItems = array_values(array_map(fn ($i) => [
         'asset_category_id' => (string) ($i['asset_category_id'] ?? ''),
         'item_name' => $i['item_name'] ?? '',
@@ -23,9 +27,10 @@
 @endphp
 
 @section('content')
-<form method="POST" action="{{ route('procurements.store') }}" enctype="multipart/form-data"
+<form method="POST" action="{{ $editing ? route('procurements.update', $procurement) : route('procurements.store') }}" enctype="multipart/form-data"
       x-data="procurementForm(@js($oldItems))">
     @csrf
+    @if ($editing) @method('PUT') @endif
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start">
         <div class="lg:col-span-2 space-y-space-lg">
             {{-- 1. Profil pemohon --}}
@@ -60,21 +65,21 @@
             <x-card title="2. Kebutuhan Pengadaan" icon="assignment">
                 <div class="grid sm:grid-cols-2 gap-space-md">
                     <x-field label="Judul Pengadaan" name="title" :required="true" class="sm:col-span-2">
-                        <input type="text" id="title" name="title" value="{{ old('title') }}" maxlength="200" class="form-input" placeholder="mis. Pengadaan 3 unit laptop engineer baru" required>
+                        <input type="text" id="title" name="title" value="{{ old('title', $procurement?->title) }}" maxlength="200" class="form-input" placeholder="mis. Pengadaan 3 unit laptop engineer baru" required>
                     </x-field>
                     <x-field label="Departemen (Cost Center)" name="department_id" :required="true">
                         <select id="department_id" name="department_id" class="form-input" required>
                             <option value="">Pilih departemen</option>
                             @foreach ($departments as $dept)
-                                <option value="{{ $dept->id }}" @selected((string) old('department_id', $employee?->department_id) === (string) $dept->id)>{{ $dept->name }}</option>
+                                <option value="{{ $dept->id }}" @selected((string) old('department_id', $procurement?->department_id ?? $employee?->department_id) === (string) $dept->id)>{{ $dept->name }}</option>
                             @endforeach
                         </select>
                     </x-field>
                     <x-field label="Tanggal Dibutuhkan" name="needed_by">
-                        <input type="date" id="needed_by" name="needed_by" value="{{ old('needed_by') }}" min="{{ now()->toDateString() }}" class="form-input">
+                        <input type="date" id="needed_by" name="needed_by" value="{{ old('needed_by', $procurement?->needed_by?->format('Y-m-d')) }}" min="{{ now()->toDateString() }}" class="form-input">
                     </x-field>
                     <x-field label="Justifikasi Bisnis & Tujuan Operasional" name="justification" :required="true" class="sm:col-span-2">
-                        <textarea id="justification" name="justification" rows="4" maxlength="5000" class="form-input" placeholder="Jelaskan alasan kebutuhan, dampak bisnis, dan rencana penggunaan..." required>{{ old('justification') }}</textarea>
+                        <textarea id="justification" name="justification" rows="4" maxlength="5000" class="form-input" placeholder="Jelaskan alasan kebutuhan, dampak bisnis, dan rencana penggunaan..." required>{{ old('justification', $procurement?->justification) }}</textarea>
                     </x-field>
                 </div>
             </x-card>
@@ -158,6 +163,17 @@
                         </li>
                     </template>
                 </ul>
+                @if ($editing && $procurement->attachments->isNotEmpty())
+                    <p class="text-label-sm uppercase text-outline mt-space-md mb-space-xs">Lampiran tersimpan</p>
+                    <ul class="space-y-space-xs">
+                        @foreach ($procurement->attachments as $file)
+                            <li class="flex items-center gap-space-sm bg-surface-subtle rounded px-space-md py-space-sm text-body-sm">
+                                <span class="material-symbols-outlined !text-[18px] text-outline">attach_file</span>
+                                <a href="{{ route('attachments.download', $file) }}" class="flex-1 truncate hover:underline">{{ $file->original_name }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
                 @error('attachments')<p class="form-error">{{ $message }}</p>@enderror
                 @foreach ($errors->get('attachments.*') as $messages)
                     <p class="form-error">{{ $messages[0] }}</p>
@@ -190,7 +206,7 @@
                     </div>
                     <div class="rounded-lg border border-blue-200 bg-blue-50 p-space-md text-body-sm text-on-surface-variant flex gap-space-sm">
                         <span class="material-symbols-outlined !text-[18px] text-status-assigned">shield</span>
-                        <span>Setelah diajukan, permintaan terkunci dan tidak dapat diubah. Simpan sebagai draft bila masih perlu dilengkapi.</span>
+                        <span>Setelah diajukan, permintaan terkunci dan tidak dapat diubah. Simpan sebagai draft bila masih perlu dilengkapi — draft cukup berisi judul dan dapat dilengkapi kemudian.</span>
                     </div>
                     <button type="submit" name="action" value="submit" class="btn btn-primary w-full justify-center">
                         <span class="material-symbols-outlined !text-[18px]">send</span> Kirim untuk Approval
@@ -199,7 +215,7 @@
                         <button type="submit" name="action" value="draft" class="btn btn-secondary justify-center" formnovalidate>
                             <span class="material-symbols-outlined !text-[18px]">save</span> Simpan Draft
                         </button>
-                        <a href="{{ route('procurements.index') }}" class="btn btn-ghost justify-center">Batal</a>
+                        <a href="{{ $editing ? route('procurements.show', $procurement) : route('procurements.index') }}" class="btn btn-ghost justify-center">Batal</a>
                     </div>
                 </div>
             </div>

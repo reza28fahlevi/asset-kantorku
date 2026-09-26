@@ -69,6 +69,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('/{procurement}', 'show')->name('show');
+        Route::get('/{procurement}/edit', 'edit')->name('edit');
+        Route::put('/{procurement}', 'update')->name('update');
         Route::post('/{procurement}/submit', 'submit')->name('submit');
         Route::post('/{procurement}/cancel', 'cancel')->name('cancel');
         Route::post('/{procurement}/order', 'order')->name('order');

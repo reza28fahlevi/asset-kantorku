@@ -40,8 +40,10 @@ class DisposalController extends Controller
     {
         $this->authorize('create', DisposalRequest::class);
 
+        $assetId = $request->query('asset_id', $request->old('asset_id'));
+
         return view('disposals.create', [
-            'asset' => $request->query('asset_id') ? Asset::with('category')->find($request->query('asset_id')) : null,
+            'asset' => $assetId ? Asset::with('category')->find($assetId) : null,
         ]);
     }
 

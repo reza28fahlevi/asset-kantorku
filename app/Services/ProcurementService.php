@@ -35,29 +35,19 @@ class ProcurementService implements ApprovalHandler
         $employee = $this->actingEmployee($user);
 
         return DB::transaction(function () use ($data, $user, $employee, $submit) {
-            $total = collect($data['items'])->sum(fn ($i) => (int) $i['quantity'] * (float) $i['estimated_unit_price']);
-
             $request = ProcurementRequest::create([
                 'request_no' => $this->numbers->requestNumber('PR'),
                 'requester_employee_id' => $employee->id,
                 'created_by_user_id' => $user->id,
                 'department_id' => $data['department_id'] ?? $employee->department_id,
                 'title' => $data['title'],
-                'justification' => $data['justification'],
+                'justification' => $data['justification'] ?? '',
                 'needed_by' => $data['needed_by'] ?? null,
-                'estimated_total' => $total,
+                'estimated_total' => 0,
                 'status' => ProcurementStatus::Draft,
             ]);
 
-            foreach ($data['items'] as $item) {
-                $request->items()->create([
-                    'asset_category_id' => $item['asset_category_id'],
-                    'item_name' => $item['item_name'],
-                    'specification' => $item['specification'] ?? null,
-                    'quantity' => $item['quantity'],
-                    'estimated_unit_price' => $item['estimated_unit_price'],
-                ]);
-            }
+            $this->syncItems($request, $data['items'] ?? []);
 
             $this->attachments->store($request, $data['attachments'] ?? null, 'QUOTATION');
 
@@ -69,6 +59,49 @@ class ProcurementService implements ApprovalHandler
         });
     }
 
+    /** Perbarui draft (item diganti seluruhnya), opsional langsung diajukan. */
+    public function update(ProcurementRequest $request, array $data, User $user, bool $submit): ProcurementRequest
+    {
+        return DB::transaction(function () use ($request, $data, $user, $submit) {
+            $request = ProcurementRequest::whereKey($request->id)->lockForUpdate()->firstOrFail();
+            $this->ensureStatus($request->status, [ProcurementStatus::Draft], 'mengubah procurement');
+
+            $request->update([
+                'department_id' => $data['department_id'] ?? $request->department_id,
+                'title' => $data['title'],
+                'justification' => $data['justification'] ?? '',
+                'needed_by' => $data['needed_by'] ?? null,
+            ]);
+
+            $request->items()->delete();
+            $this->syncItems($request, $data['items'] ?? []);
+            $this->attachments->store($request, $data['attachments'] ?? null, 'QUOTATION');
+
+            if ($submit) {
+                $this->submit($request, $user);
+            }
+
+            return $request;
+        });
+    }
+
+    /** Simpan baris item yang lengkap dan hitung ulang total estimasi. */
+    private function syncItems(ProcurementRequest $request, array $items): void
+    {
+        $items = collect($items)
+            ->filter(fn ($i) => ! empty($i['asset_category_id']) && filled($i['item_name'] ?? null))
+            ->map(fn ($i) => [
+                'asset_category_id' => $i['asset_category_id'],
+                'item_name' => $i['item_name'],
+                'specification' => $i['specification'] ?? null,
+                'quantity' => max(1, (int) ($i['quantity'] ?? 1)),
+                'estimated_unit_price' => (float) ($i['estimated_unit_price'] ?? 0),
+            ]);
+
+        $items->each(fn ($item) => $request->items()->create($item));
+        $request->update(['estimated_total' => $items->sum(fn ($i) => $i['quantity'] * $i['estimated_unit_price'])]);
+    }
+
     public function submit(ProcurementRequest $request, User $user): void
     {
         DB::transaction(function () use ($request, $user) {
@@ -76,6 +109,9 @@ class ProcurementService implements ApprovalHandler
             $this->ensureStatus($request->status, [ProcurementStatus::Draft], 'mengajukan procurement');
             if ($request->items()->doesntExist()) {
                 throw new BusinessRuleException('Procurement harus memiliki minimal satu item.');
+            }
+            if (blank($request->justification)) {
+                throw new BusinessRuleException('Justifikasi wajib diisi sebelum diajukan.');
             }
 
             $request->update(['status' => ProcurementStatus::PendingApproval, 'submitted_at' => now()]);

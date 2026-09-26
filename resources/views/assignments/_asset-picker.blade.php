@@ -1,5 +1,19 @@
 {{-- Pemilih aset berbasis Alpine: cari via assets.search, simpan sebagai asset_ids[]. Param: $max --}}
-<div x-data="assetPicker(@js(array_values(array_map('intval', (array) old('asset_ids', [])))), {{ $max ?? 50 }})" class="space-y-space-md">
+@php
+    // Pulihkan detail aset terpilih setelah validasi gagal (old input hanya berisi id)
+    $oldIds = array_values(array_filter(array_map('intval', (array) old('asset_ids', []))));
+    $oldAssets = $oldIds
+        ? \App\Models\Asset::with('category', 'location')->whereIn('id', $oldIds)->get()->keyBy('id')
+        : collect();
+    $initialSelected = collect($oldIds)->map(fn ($id) => $oldAssets->has($id) ? [
+        'id' => $id,
+        'asset_tag' => $oldAssets[$id]->asset_tag,
+        'name' => $oldAssets[$id]->name,
+        'category' => $oldAssets[$id]->category?->name ?? '-',
+        'location' => $oldAssets[$id]->location?->name ?? '-',
+    ] : null)->filter()->values();
+@endphp
+<div x-data="assetPicker(@js($initialSelected), {{ $max ?? 50 }})" class="space-y-space-md">
     <div class="flex gap-space-sm">
         <div class="relative flex-1">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline !text-[18px]">search</span>
@@ -52,10 +66,10 @@
 @once
 @push('scripts')
 <script>
-function assetPicker(oldIds, max) {
+function assetPicker(initial, max) {
     return {
         q: '', results: [], loading: false, searched: false, max: max,
-        selected: oldIds.map(id => ({ id: id, asset_tag: '#' + id, name: '(dipilih sebelumnya)', category: '-', location: '-' })),
+        selected: initial,
         isSelected(id) { return this.selected.some(s => s.id === id); },
         add(a) { if (!this.isSelected(a.id) && this.selected.length < this.max) this.selected.push(a); },
         async search() {

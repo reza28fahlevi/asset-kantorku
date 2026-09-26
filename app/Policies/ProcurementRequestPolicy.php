@@ -23,6 +23,12 @@ class ProcurementRequestPolicy extends RequestPolicy
         return ProcurementStatus::Draft;
     }
 
+    /** Draft hanya dapat diubah oleh pemiliknya. */
+    public function update(User $user, ProcurementRequest $request): bool
+    {
+        return $this->submit($user, $request);
+    }
+
     public function order(User $user, ProcurementRequest $request): bool
     {
         return $request->status === ProcurementStatus::Approved && $user->hasPermission('procurement.order');

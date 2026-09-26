@@ -14,6 +14,7 @@ use App\Services\ProcurementService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ProcurementController extends Controller
@@ -53,26 +54,37 @@ class ProcurementController extends Controller
     {
         $this->authorize('create', ProcurementRequest::class);
 
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:200'],
-            'justification' => ['required', 'string', 'max:5000'],
-            'department_id' => ['required', Rule::exists('departments', 'id')->whereNull('deleted_at')],
-            'needed_by' => ['nullable', 'date', 'after_or_equal:today'],
-            'items' => ['required', 'array', 'min:1', 'max:50'],
-            'items.*.asset_category_id' => ['required', Rule::exists('asset_categories', 'id')->whereNull('deleted_at')],
-            'items.*.item_name' => ['required', 'string', 'max:200'],
-            'items.*.specification' => ['nullable', 'string', 'max:2000'],
-            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:1000'],
-            'items.*.estimated_unit_price' => ['required', 'numeric', 'min:0'],
-            'attachments' => ['nullable', 'array', 'max:5'],
-            'attachments.*' => AttachmentService::rules(),
-        ]);
-
-        $procurement = $this->service->create($data, $request->user(), $request->input('action') === 'submit');
+        $submit = $request->input('action') === 'submit';
+        $procurement = $this->service->create($this->validated($request, $submit), $request->user(), $submit);
 
         return redirect()->route('procurements.show', $procurement)->with('success', $procurement->status === ProcurementStatus::Draft
             ? "Draft {$procurement->request_no} tersimpan."
             : "{$procurement->request_no} berhasil diajukan dan menunggu approval.");
+    }
+
+    /** Lengkapi draft yang belum diajukan. */
+    public function edit(ProcurementRequest $procurement): View
+    {
+        $this->authorize('update', $procurement);
+
+        return view('procurements.create', [
+            'procurement' => $procurement->load('items', 'attachments'),
+            'categories' => AssetCategory::active()->orderBy('name')->get(),
+            'departments' => Department::active()->orderBy('name')->get(),
+            'employee' => $procurement->requester,
+        ]);
+    }
+
+    public function update(Request $request, ProcurementRequest $procurement): RedirectResponse
+    {
+        $this->authorize('update', $procurement);
+
+        $submit = $request->input('action') === 'submit';
+        $this->service->update($procurement, $this->validated($request, $submit), $request->user(), $submit);
+
+        return redirect()->route('procurements.show', $procurement)->with('success', $submit
+            ? "{$procurement->request_no} berhasil diajukan dan menunggu approval."
+            : "Draft {$procurement->request_no} diperbarui.");
     }
 
     public function show(ProcurementRequest $procurement): View
@@ -145,7 +157,7 @@ class ProcurementController extends Controller
             'items.*.rejected' => ['nullable', 'integer', 'min:0'],
             'items.*.exception_notes' => ['nullable', 'string', 'max:1000'],
             'items.*.serial_numbers' => ['nullable', 'string', 'max:10000'],
-            'items.*.location_id' => ['required_with:items.*.accepted', 'nullable', Rule::exists('locations', 'id')->whereNull('deleted_at')],
+            'items.*.location_id' => ['nullable', Rule::exists('locations', 'id')->whereNull('deleted_at')],
             'items.*.unit_cost' => ['nullable', 'numeric', 'min:0'],
             'items.*.warranty_end_date' => ['nullable', 'date'],
             'items.*.condition' => ['nullable', Rule::enum(AssetCondition::class)],
@@ -154,6 +166,14 @@ class ProcurementController extends Controller
             'attachments' => ['nullable', 'array', 'max:5'],
             'attachments.*' => AttachmentService::rules(),
         ]);
+
+        // Lokasi hanya wajib untuk item yang benar-benar diterima (jumlah diterima > 0)
+        $missingLocation = collect($data['items'])
+            ->filter(fn ($item) => (int) ($item['accepted'] ?? 0) > 0 && empty($item['location_id']))
+            ->mapWithKeys(fn ($item, $id) => ["items.{$id}.location_id" => 'Lokasi penempatan wajib diisi untuk item yang diterima.']);
+        if ($missingLocation->isNotEmpty()) {
+            throw ValidationException::withMessages($missingLocation->all());
+        }
 
         $receipt = $this->service->receive($procurement, $data, $request->user());
 
@@ -168,5 +188,29 @@ class ProcurementController extends Controller
         $this->service->close($procurement, $data['closing_note']);
 
         return back()->with('success', 'Procurement ditutup.');
+    }
+
+    /**
+     * Validasi pengajuan. Draft boleh belum lengkap (cukup judul); baris item yang belum
+     * lengkap diabaikan saat disimpan. Pengajuan (submit) wajib lengkap.
+     */
+    private function validated(Request $request, bool $submit): array
+    {
+        $required = $submit ? 'required' : 'nullable';
+
+        return $request->validate([
+            'title' => ['required', 'string', 'max:200'],
+            'justification' => [$required, 'string', 'max:5000'],
+            'department_id' => [$required, Rule::exists('departments', 'id')->whereNull('deleted_at')],
+            'needed_by' => ['nullable', 'date', 'after_or_equal:today'],
+            'items' => [$required, 'array', 'min:'.($submit ? 1 : 0), 'max:50'],
+            'items.*.asset_category_id' => [$required, Rule::exists('asset_categories', 'id')->whereNull('deleted_at')],
+            'items.*.item_name' => [$required, 'string', 'max:200'],
+            'items.*.specification' => ['nullable', 'string', 'max:2000'],
+            'items.*.quantity' => [$required, 'integer', 'min:1', 'max:1000'],
+            'items.*.estimated_unit_price' => [$required, 'numeric', 'min:0'],
+            'attachments' => ['nullable', 'array', 'max:5'],
+            'attachments.*' => AttachmentService::rules(),
+        ]);
     }
 }

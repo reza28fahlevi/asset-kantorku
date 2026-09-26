@@ -1,32 +1,58 @@
 @php
     $user = auth()->user();
+    // Menu sidebar. Item tanpa 'children' = link langsung; dengan 'children' = accordion.
+    // 'perm' kosong = semua user login; 'active' = pola nama route untuk status aktif.
+    $link = fn ($label, $route, $active, $perm = [], $badge = null) => compact('label', 'route', 'active', 'perm', 'badge');
     $menu = [
-        'Main Menu' => [
-            ['Dashboard', 'dashboard', 'dashboard', 'dashboard', ['dashboard.view']],
-            ['Asset Register', 'assets.index', 'assets.*', 'inventory_2', ['asset.view']],
-        ],
-        'Transaksi & Alur' => [
-            ['Approval Inbox', 'approvals.index', 'approvals.*', 'mark_email_unread', ['approval.decide'], $pendingApprovalCount],
-            ['Pengadaan', 'procurements.index', 'procurements.*', 'shopping_cart_checkout', []],
-            ['Serah Terima', 'assignments.index', 'assignments.*', 'assignment_ind', []],
-            ['Peminjaman', 'loans.index', 'loans.*', 'swap_horiz', []],
-            ['Disposal', 'disposals.index', 'disposals.*', 'delete_forever', []],
-        ],
-        'Master Data' => [
-            ['Karyawan', 'masters.employees.index', 'masters.employees.*', 'badge', ['employee.view']],
-            ['Departemen', 'masters.departments.index', 'masters.departments.*', 'corporate_fare', ['master.view', 'master.manage']],
-            ['Lokasi', 'masters.locations.index', 'masters.locations.*', 'location_on', ['master.view', 'master.manage']],
-            ['Kategori Aset', 'masters.categories.index', 'masters.categories.*', 'category', ['master.view', 'master.manage']],
-            ['Vendor', 'masters.vendors.index', 'masters.vendors.*', 'storefront', ['master.view', 'master.manage']],
-        ],
-        'Laporan & Administrasi' => [
-            ['Laporan', 'reports.index', 'reports.*', 'analytics', ['report.view']],
-            ['Pengguna', 'admin.users.index', 'admin.users.*', 'manage_accounts', ['user.manage']],
-            ['Role & Hak Akses', 'admin.roles.index', 'admin.roles.*', 'admin_panel_settings', ['role.manage']],
-            ['Pengaturan', 'admin.settings.edit', 'admin.settings.*', 'settings', ['setting.manage']],
-            ['Audit Log', 'admin.audit.index', 'admin.audit.*', 'receipt_long', ['audit.view']],
-        ],
+        ['label' => 'Dashboard', 'icon' => 'dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'perm' => ['dashboard.view']],
+        ['label' => 'Asset Register', 'icon' => 'inventory_2', 'active' => ['assets.*'], 'perm' => ['asset.view'], 'children' => [
+            $link('Katalog Aset', 'assets.index', ['assets.index', 'assets.show', 'assets.edit'], ['asset.view']),
+            $link('Registrasi Aset', 'assets.create', 'assets.create', ['asset.create']),
+        ]],
+        ['label' => 'Approval Inbox', 'icon' => 'mark_email_unread', 'route' => 'approvals.index', 'active' => 'approvals.*', 'perm' => ['approval.decide'], 'badge' => $pendingApprovalCount],
+        ['label' => 'Pengadaan Aset', 'icon' => 'shopping_cart_checkout', 'active' => ['procurements.*'], 'children' => [
+            $link('Ajukan Pengadaan', 'procurements.create', 'procurements.create', ['procurement.create']),
+            $link('Daftar Pengadaan', 'procurements.index', ['procurements.index', 'procurements.show', 'procurements.receive-form']),
+        ]],
+        ['label' => 'Serah Terima Aset', 'icon' => 'assignment_ind', 'active' => ['assignments.*'], 'children' => [
+            $link('Ajukan Serah Terima', 'assignments.create', 'assignments.create', ['assignment.create']),
+            $link('Daftar Pengajuan', 'assignments.index', ['assignments.index', 'assignments.show']),
+            $link('Aset Dipegang', 'assignments.active', 'assignments.active'),
+        ]],
+        ['label' => 'Peminjaman Aset', 'icon' => 'swap_horiz', 'active' => ['loans.*'], 'children' => [
+            $link('Ajukan Peminjaman', 'loans.create', 'loans.create', ['loan.create']),
+            $link('Daftar Pengajuan', 'loans.index', ['loans.index', 'loans.show']),
+            $link('Pinjaman Aktif', 'loans.active', 'loans.active'),
+        ]],
+        ['label' => 'Disposal Aset', 'icon' => 'delete_forever', 'active' => ['disposals.*'], 'children' => [
+            $link('Ajukan Penghapusan', 'disposals.create', 'disposals.create', ['disposal.create']),
+            $link('Daftar Disposal', 'disposals.index', ['disposals.index', 'disposals.show']),
+        ]],
+        ['label' => 'Master Data', 'icon' => 'database', 'active' => ['masters.*'], 'children' => [
+            $link('Karyawan', 'masters.employees.index', 'masters.employees.*', ['employee.view']),
+            $link('Departemen', 'masters.departments.index', 'masters.departments.*', ['master.view', 'master.manage']),
+            $link('Lokasi', 'masters.locations.index', 'masters.locations.*', ['master.view', 'master.manage']),
+            $link('Kategori Aset', 'masters.categories.index', 'masters.categories.*', ['master.view', 'master.manage']),
+            $link('Vendor', 'masters.vendors.index', 'masters.vendors.*', ['master.view', 'master.manage']),
+        ]],
+        ['label' => 'Laporan', 'icon' => 'analytics', 'route' => 'reports.index', 'active' => 'reports.*', 'perm' => ['report.view']],
+        ['label' => 'Administrasi', 'icon' => 'admin_panel_settings', 'active' => ['admin.*'], 'children' => [
+            $link('Pengguna', 'admin.users.index', 'admin.users.*', ['user.manage']),
+            $link('Role & Hak Akses', 'admin.roles.index', 'admin.roles.*', ['role.manage']),
+            $link('Pengaturan', 'admin.settings.edit', 'admin.settings.*', ['setting.manage']),
+            $link('Audit Log', 'admin.audit.index', 'admin.audit.*', ['audit.view']),
+        ]],
     ];
+    $allowed = fn ($item) => empty($item['perm']) || $user->hasAnyPermission($item['perm']);
+    $menu = collect($menu)
+        ->filter($allowed)
+        ->map(function ($item) use ($allowed) {
+            if (isset($item['children'])) {
+                $item['children'] = array_values(array_filter($item['children'], $allowed));
+            }
+            return $item;
+        })
+        ->reject(fn ($item) => isset($item['children']) && empty($item['children']));
     $initials = collect(explode(' ', $user->name))->filter()->take(2)->map(fn ($p) => mb_strtoupper(mb_substr($p, 0, 1)))->implode('');
 @endphp
 <!DOCTYPE html>
@@ -53,30 +79,46 @@
             <span class="text-label-sm text-secondary-container uppercase tracking-tight truncate">{{ $user->roles->pluck('name')->implode(', ') ?: 'Pengguna' }}</span>
         </div>
     </div>
-    <div class="flex-1 overflow-y-auto px-space-xs py-space-sm space-y-space-md">
-        @foreach ($menu as $group => $items)
-            @php $items = array_filter($items, fn ($i) => empty($i[4]) || $user->hasAnyPermission($i[4])); @endphp
-            @continue(empty($items))
-            <div>
-                <span class="px-space-md text-label-sm text-on-primary-container uppercase tracking-wider block mb-1">{{ $group }}</span>
-                <nav class="space-y-0.5">
-                    @foreach ($items as $item)
-                        @php $active = request()->routeIs($item[2]); @endphp
-                        <a href="{{ route($item[1]) }}" @if ($active) aria-current="page" @endif
-                           class="flex items-center justify-between px-space-md py-space-sm rounded transition-colors {{ $active ? 'bg-inverse-surface text-on-primary font-semibold' : 'text-on-primary-container hover:bg-inverse-surface hover:text-on-primary' }}">
-                            <span class="flex items-center gap-space-sm">
-                                <span class="material-symbols-outlined !text-[18px]">{{ $item[3] }}</span>
-                                <span class="text-body-sm">{{ $item[0] }}</span>
-                            </span>
-                            @if (! empty($item[5]))
-                                <span class="bg-error text-on-error text-label-sm px-1.5 py-0.5 rounded-full">{{ $item[5] }}</span>
-                            @endif
-                        </a>
-                    @endforeach
-                </nav>
-            </div>
+    {{-- Menu accordion: grup yang berisi halaman aktif terbuka otomatis, hanya satu grup terbuka sekaligus --}}
+    <nav class="flex-1 overflow-y-auto px-space-xs py-space-sm space-y-0.5"
+         x-data="{ open: @js($menu->search(fn ($i) => isset($i['children']) && request()->routeIs(...(array) $i['active']))) }">
+        <span class="px-space-md text-label-sm text-on-primary-container uppercase tracking-wider block mb-1">Menu Utama</span>
+        @foreach ($menu as $key => $item)
+            @php $groupActive = request()->routeIs(...(array) $item['active']); @endphp
+            @if (isset($item['children']))
+                <div>
+                    <button type="button" @click="open = open === {{ $key }} ? null : {{ $key }}" :aria-expanded="open === {{ $key }}"
+                            class="w-full flex items-center justify-between px-space-md py-space-sm rounded transition-colors {{ $groupActive ? 'text-on-primary font-semibold' : 'text-on-primary-container hover:bg-inverse-surface hover:text-on-primary' }}">
+                        <span class="flex items-center gap-space-sm">
+                            <span class="material-symbols-outlined !text-[18px] {{ $groupActive ? 'text-secondary-container' : '' }}">{{ $item['icon'] }}</span>
+                            <span class="text-body-sm">{{ $item['label'] }}</span>
+                        </span>
+                        <span class="material-symbols-outlined !text-[18px] transition-transform" :class="open === {{ $key }} && 'rotate-180'">expand_more</span>
+                    </button>
+                    <div x-show="open === {{ $key }}" x-collapse @if (! $groupActive) x-cloak @endif class="mt-0.5 mb-1 ml-[21px] pl-space-sm border-l border-inverse-surface space-y-0.5">
+                        @foreach ($item['children'] as $child)
+                            @php $active = request()->routeIs(...(array) $child['active']); @endphp
+                            <a href="{{ route($child['route']) }}" @if ($active) aria-current="page" @endif
+                               class="block px-space-md py-1.5 rounded text-body-sm transition-colors {{ $active ? 'bg-inverse-surface text-on-primary font-semibold' : 'text-on-primary-container hover:bg-inverse-surface hover:text-on-primary' }}">
+                                {{ $child['label'] }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <a href="{{ route($item['route']) }}" @if ($groupActive) aria-current="page" @endif
+                   class="flex items-center justify-between px-space-md py-space-sm rounded transition-colors {{ $groupActive ? 'bg-inverse-surface text-on-primary font-semibold' : 'text-on-primary-container hover:bg-inverse-surface hover:text-on-primary' }}">
+                    <span class="flex items-center gap-space-sm">
+                        <span class="material-symbols-outlined !text-[18px]">{{ $item['icon'] }}</span>
+                        <span class="text-body-sm">{{ $item['label'] }}</span>
+                    </span>
+                    @if (! empty($item['badge']))
+                        <span class="bg-error text-on-error text-label-sm px-1.5 py-0.5 rounded-full">{{ $item['badge'] }}</span>
+                    @endif
+                </a>
+            @endif
         @endforeach
-    </div>
+    </nav>
     <div class="p-space-md bg-tertiary-container text-center">
         <span class="text-label-sm text-on-tertiary-container">{{ config('app.name', 'AssetPro') }} · Enterprise Edition</span>
     </div>

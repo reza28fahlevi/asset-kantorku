@@ -218,23 +218,26 @@
 
                             {{-- Keputusan --}}
                             @if ($step->isPending())
-                                <div class="rounded-lg border border-border-subtle bg-surface-subtle p-space-md" x-data="{ comment: @js(old('comment', '')) }">
+                                @php $isOldStep = (string) old('step_id') === (string) $step->id; @endphp
+                                <div class="rounded-lg border border-border-subtle bg-surface-subtle p-space-md" x-data="{ comment: @js($isOldStep ? old('comment', '') : '') }">
                                     <div class="flex items-start justify-between gap-space-md mb-space-sm">
                                         <h3 class="text-title-md flex items-center gap-space-xs"><span class="material-symbols-outlined">gavel</span> Keputusan Anda</h3>
                                         <p class="text-label-sm font-normal text-outline text-right">Keputusan bersifat final & tercatat di audit trail</p>
                                     </div>
-                                    <x-field label="Catatan / Komentar" name="comment" hint="Wajib diisi (min. 5 karakter) bila menolak permintaan.">
+                                    <x-field label="Catatan / Komentar" :name="$isOldStep ? 'comment' : null" hint="Wajib diisi (min. 5 karakter) bila menolak permintaan.">
                                         <textarea x-model="comment" rows="3" maxlength="2000" class="form-input" placeholder="Tuliskan catatan persetujuan atau alasan penolakan..."></textarea>
                                     </x-field>
                                     <div class="flex flex-wrap justify-end gap-space-sm mt-space-md">
                                         <form method="POST" action="{{ route('approvals.reject', $step) }}"
                                               @submit="if (comment.trim().length < 5) { $event.preventDefault(); alert('Alasan penolakan wajib diisi minimal 5 karakter.'); } else if (! confirm('Tolak permintaan ini?')) { $event.preventDefault(); }">
                                             @csrf
+                                            <input type="hidden" name="step_id" value="{{ $step->id }}">
                                             <input type="hidden" name="comment" :value="comment">
                                             <button type="submit" class="btn btn-danger"><span class="material-symbols-outlined !text-[18px]">close</span> Tolak Permohonan</button>
                                         </form>
                                         <form method="POST" action="{{ route('approvals.approve', $step) }}" @submit="if (! confirm('Setujui permintaan ini?')) $event.preventDefault()">
                                             @csrf
+                                            <input type="hidden" name="step_id" value="{{ $step->id }}">
                                             <input type="hidden" name="comment" :value="comment">
                                             <button type="submit" class="btn btn-primary"><span class="material-symbols-outlined !text-[18px]">check_circle</span> Setujui Permohonan</button>
                                         </form>

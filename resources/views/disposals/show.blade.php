@@ -49,7 +49,7 @@
                     <dt>Tanggal Eksekusi</dt><dd>{{ $disposal->executed_at?->format('d M Y') }}</dd>
                     <dt>Metode Aktual</dt><dd>{{ $disposal->actual_method?->label() ?? '-' }}</dd>
                     <dt>Penerima</dt><dd>{{ $disposal->disposal_recipient ?: '-' }}</dd>
-                    <dt>Hasil Penjualan</dt><dd>{{ $disposal->proceeds_amount !== null ? 'Rp '.number_format($disposal->proceeds_amount, 0, ',', '.') : '-' }}</dd>
+                    <dt>Hasil Penjualan</dt><dd>{{ $disposal->proceeds_amount !== null ? 'Rp '.number_format((float) $disposal->proceeds_amount, 0, ',', '.') : '-' }}</dd>
                     <dt>Dieksekusi Oleh</dt><dd>{{ $disposal->executedBy?->name ?? '-' }}</dd>
                     <dt>Catatan</dt><dd class="whitespace-pre-line">{{ $disposal->execution_notes ?: '-' }}</dd>
                     <dt>Selesai</dt><dd>{{ $disposal->completed_at?->format('d M Y H:i') ?? '-' }}</dd>
@@ -139,13 +139,7 @@
             @endif
         </x-card>
 
-        <x-card title="Riwayat Approval" icon="fact_check">
-            @if ($disposal->approvalRequest)
-                <x-approval-timeline :approval="$disposal->approvalRequest" />
-            @else
-                <p class="text-body-sm text-on-surface-variant">Belum diajukan untuk approval.</p>
-            @endif
-        </x-card>
+        <x-approval-timeline :approval="$disposal->approvalRequest" />
     </div>
 </div>
 @endsection
