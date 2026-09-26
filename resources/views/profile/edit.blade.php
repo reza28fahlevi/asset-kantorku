@@ -47,7 +47,7 @@
 
     <div>
         <x-card title="Ubah Password" icon="lock" class="lg:sticky lg:top-space-lg">
-            <form method="POST" action="{{ route('profile.password') }}" class="space-y-space-md">
+            <form method="POST" data-ajax-form action="{{ route('profile.password') }}" class="space-y-space-md">
                 @csrf
                 @method('PUT')
                 <x-field label="Password Saat Ini" name="current_password" :required="true">

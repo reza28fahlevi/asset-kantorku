@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
@@ -14,7 +15,7 @@ class ProfileController extends Controller
         return view('profile.edit', ['user' => $request->user()->load('employee.department', 'employee.manager', 'roles')]);
     }
 
-    public function updatePassword(Request $request): RedirectResponse
+    public function updatePassword(Request $request): JsonResponse|RedirectResponse
     {
         $data = $request->validate([
             'current_password' => ['required', 'current_password'],
@@ -23,6 +24,6 @@ class ProfileController extends Controller
 
         $request->user()->update(['password' => $data['password']]);
 
-        return back()->with('success', 'Password berhasil diperbarui.');
+        return $this->respond($request, 'Password berhasil diperbarui.');
     }
 }

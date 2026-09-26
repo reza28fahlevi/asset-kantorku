@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -70,12 +71,12 @@ abstract class MasterDataController extends Controller
         return $this->form(null);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $data = $this->prepare($request->validate($this->rules(null)), $request);
         $this->modelClass()::create($data);
 
-        return redirect()->route("masters.{$this->key()}.index")->with('success', "{$this->title()} berhasil ditambahkan.");
+        return $this->respond($request, "{$this->title()} berhasil ditambahkan.", route("masters.{$this->key()}.index"));
     }
 
     public function edit(string $id): View
@@ -83,25 +84,25 @@ abstract class MasterDataController extends Controller
         return $this->form($this->modelClass()::findOrFail($id));
     }
 
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(Request $request, string $id): JsonResponse|RedirectResponse
     {
         $model = $this->modelClass()::findOrFail($id);
         $model->update($this->prepare($request->validate($this->rules($model)), $request));
 
-        return redirect()->route("masters.{$this->key()}.index")->with('success', "{$this->title()} berhasil diperbarui.");
+        return $this->respond($request, "{$this->title()} berhasil diperbarui.", route("masters.{$this->key()}.index"));
     }
 
-    public function destroy(string $id): RedirectResponse
+    public function destroy(Request $request, string $id): JsonResponse|RedirectResponse
     {
         $model = $this->modelClass()::findOrFail($id);
 
         if ($model->isInUse()) {
-            return back()->with('error', "{$this->title()} sudah dipakai pada data/transaksi sehingga tidak dapat dihapus. Nonaktifkan saja.");
+            return $this->respond($request, "{$this->title()} sudah dipakai pada data/transaksi sehingga tidak dapat dihapus. Nonaktifkan saja.", status: 'error');
         }
 
         $model->delete();
 
-        return back()->with('success', "{$this->title()} berhasil dihapus.");
+        return $this->respond($request, "{$this->title()} berhasil dihapus.");
     }
 
     protected function form(?Model $model): View

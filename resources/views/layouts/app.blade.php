@@ -62,7 +62,10 @@
 <html lang="id">
 <head>
     @include('layouts.partials.head')
-    <script src="{{ asset('js/ajax-nav.js') }}?v=3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    {{-- ajax-form sebelum ajax-nav: handler submit form [data-ajax-form] harus terpasang lebih dulu --}}
+    <script src="{{ asset('js/ajax-form.js') }}?v=2"></script>
+    <script src="{{ asset('js/ajax-nav.js') }}?v=4"></script>
     @stack('head')
     {{-- Terapkan status sidebar tersembunyi sebelum Alpine aktif agar tidak berkedip saat halaman dimuat --}}
     <script>try { if (localStorage.getItem('sidebar-hidden') === '1') document.documentElement.classList.add('sb-hidden'); } catch (e) {}</script>
@@ -187,7 +190,7 @@
                     <div class="card-header py-space-sm">
                         <span class="text-label-md">Notifikasi</span>
                         @if ($unreadNotificationCount)
-                            <form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="text-label-sm text-secondary hover:underline">Tandai semua dibaca</button></form>
+                            <form method="POST" data-ajax-form action="{{ route('notifications.read-all') }}">@csrf<button class="text-label-sm text-secondary hover:underline">Tandai semua dibaca</button></form>
                         @endif
                     </div>
                     <div class="max-h-80 overflow-y-auto divide-y divide-border-subtle">

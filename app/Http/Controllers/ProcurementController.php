@@ -11,6 +11,7 @@ use App\Models\ProcurementRequest;
 use App\Models\Vendor;
 use App\Services\AttachmentService;
 use App\Services\ProcurementService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -82,16 +83,16 @@ class ProcurementController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $this->authorize('create', ProcurementRequest::class);
 
         $submit = $request->input('action') === 'submit';
         $procurement = $this->service->create($this->validated($request, $submit), $request->user(), $submit);
 
-        return redirect()->route('procurements.show', $procurement)->with('success', $procurement->status === ProcurementStatus::Draft
+        return $this->respond($request, $procurement->status === ProcurementStatus::Draft
             ? "Draft {$procurement->request_no} tersimpan."
-            : "{$procurement->request_no} berhasil diajukan dan menunggu approval.");
+            : "{$procurement->request_no} berhasil diajukan dan menunggu approval.", route('procurements.show', $procurement));
     }
 
     /** Lengkapi draft yang belum diajukan. */
@@ -107,16 +108,16 @@ class ProcurementController extends Controller
         ]);
     }
 
-    public function update(Request $request, ProcurementRequest $procurement): RedirectResponse
+    public function update(Request $request, ProcurementRequest $procurement): JsonResponse|RedirectResponse
     {
         $this->authorize('update', $procurement);
 
         $submit = $request->input('action') === 'submit';
         $this->service->update($procurement, $this->validated($request, $submit), $request->user(), $submit);
 
-        return redirect()->route('procurements.show', $procurement)->with('success', $submit
+        return $this->respond($request, $submit
             ? "{$procurement->request_no} berhasil diajukan dan menunggu approval."
-            : "Draft {$procurement->request_no} diperbarui.");
+            : "Draft {$procurement->request_no} diperbarui.", route('procurements.show', $procurement));
     }
 
     public function show(ProcurementRequest $procurement): View
@@ -136,24 +137,24 @@ class ProcurementController extends Controller
         ]);
     }
 
-    public function submit(Request $request, ProcurementRequest $procurement): RedirectResponse
+    public function submit(Request $request, ProcurementRequest $procurement): JsonResponse|RedirectResponse
     {
         $this->authorize('submit', $procurement);
         $this->service->submit($procurement, $request->user());
 
-        return back()->with('success', "{$procurement->request_no} berhasil diajukan.");
+        return $this->respond($request, "{$procurement->request_no} berhasil diajukan.");
     }
 
-    public function cancel(Request $request, ProcurementRequest $procurement): RedirectResponse
+    public function cancel(Request $request, ProcurementRequest $procurement): JsonResponse|RedirectResponse
     {
         $this->authorize('cancel', $procurement);
         $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
         $this->service->cancel($procurement, $request->user(), $data['cancel_reason'] ?? null);
 
-        return back()->with('success', "{$procurement->request_no} dibatalkan.");
+        return $this->respond($request, "{$procurement->request_no} dibatalkan.");
     }
 
-    public function order(Request $request, ProcurementRequest $procurement): RedirectResponse
+    public function order(Request $request, ProcurementRequest $procurement): JsonResponse|RedirectResponse
     {
         $this->authorize('order', $procurement);
 
@@ -164,7 +165,7 @@ class ProcurementController extends Controller
         ]);
         $this->service->order($procurement, $data);
 
-        return back()->with('success', 'Pemesanan berhasil dicatat.');
+        return $this->respond($request, 'Pemesanan berhasil dicatat.');
     }
 
     public function receiveForm(ProcurementRequest $procurement): View
@@ -177,7 +178,7 @@ class ProcurementController extends Controller
         ]);
     }
 
-    public function receive(Request $request, ProcurementRequest $procurement): RedirectResponse
+    public function receive(Request $request, ProcurementRequest $procurement): JsonResponse|RedirectResponse
     {
         $this->authorize('receive', $procurement);
 
@@ -210,17 +211,16 @@ class ProcurementController extends Controller
 
         $receipt = $this->service->receive($procurement, $data, $request->user());
 
-        return redirect()->route('procurements.show', $procurement)
-            ->with('success', "Penerimaan {$receipt->receipt_no} tercatat; {$receipt->assets()->count()} aset baru teregistrasi.");
+        return $this->respond($request, "Penerimaan {$receipt->receipt_no} tercatat; {$receipt->assets()->count()} aset baru teregistrasi.", route('procurements.show', $procurement));
     }
 
-    public function close(Request $request, ProcurementRequest $procurement): RedirectResponse
+    public function close(Request $request, ProcurementRequest $procurement): JsonResponse|RedirectResponse
     {
         $this->authorize('close', $procurement);
         $data = $request->validate(['closing_note' => ['required', 'string', 'max:2000']]);
         $this->service->close($procurement, $data['closing_note']);
 
-        return back()->with('success', 'Procurement ditutup.');
+        return $this->respond($request, 'Procurement ditutup.');
     }
 
     /**

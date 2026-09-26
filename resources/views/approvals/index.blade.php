@@ -228,14 +228,14 @@
                                         <textarea x-model="comment" rows="3" maxlength="2000" class="form-input" placeholder="Tuliskan catatan persetujuan atau alasan penolakan..."></textarea>
                                     </x-field>
                                     <div class="flex flex-wrap justify-end gap-space-sm mt-space-md">
-                                        <form method="POST" action="{{ route('approvals.reject', $step) }}"
-                                              @submit="if (comment.trim().length < 5) { $event.preventDefault(); alert('Alasan penolakan wajib diisi minimal 5 karakter.'); } else if (! confirm('Tolak permintaan ini?')) { $event.preventDefault(); }">
+                                        <form method="POST" data-ajax-form data-confirm="Tolak permintaan ini?" data-confirm-button="Ya, tolak" action="{{ route('approvals.reject', $step) }}"
+                                              @submit="if (comment.trim().length < 5) { $event.preventDefault(); AppAlert.error('Alasan penolakan wajib diisi minimal 5 karakter.', 'Alasan wajib diisi'); }">
                                             @csrf
                                             <input type="hidden" name="step_id" value="{{ $step->id }}">
                                             <input type="hidden" name="comment" :value="comment">
                                             <button type="submit" class="btn btn-danger"><span class="material-symbols-outlined !text-[18px]">close</span> Tolak Permohonan</button>
                                         </form>
-                                        <form method="POST" action="{{ route('approvals.approve', $step) }}" @submit="if (! confirm('Setujui permintaan ini?')) $event.preventDefault()">
+                                        <form method="POST" data-ajax-form data-confirm="Setujui permintaan ini?" data-confirm-button="Ya, setujui" action="{{ route('approvals.approve', $step) }}">
                                             @csrf
                                             <input type="hidden" name="step_id" value="{{ $step->id }}">
                                             <input type="hidden" name="comment" :value="comment">

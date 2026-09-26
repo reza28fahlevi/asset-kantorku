@@ -9,8 +9,8 @@
             <span class="material-symbols-outlined !text-[18px]">cancel</span> Batalkan
         </button>
         <div x-cloak x-show="open" x-transition.opacity class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-space-lg" role="dialog" @keydown.escape.window="open = false">
-            <form method="POST" action="{{ $action }}" class="card w-full max-w-md text-left" @click.outside="open = false"
-                  @submit="if (reason.trim().length < 5) { $event.preventDefault(); alert('Alasan pembatalan wajib diisi minimal 5 karakter.'); }">
+            <form method="POST" data-ajax-form action="{{ $action }}" class="card w-full max-w-md text-left" @click.outside="open = false"
+                  @submit="if (reason.trim().length < 5) { $event.preventDefault(); AppAlert.error('Alasan pembatalan wajib diisi minimal 5 karakter.', 'Alasan wajib diisi'); }">
                 @csrf
                 <div class="card-header">
                     <h3 class="card-title flex items-center gap-space-sm"><span class="material-symbols-outlined text-error">cancel</span> Batalkan {{ $label }}</h3>

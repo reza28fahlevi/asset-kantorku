@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<form method="POST" action="{{ route('admin.settings.update') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<form method="POST" data-ajax-form action="{{ route('admin.settings.update') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
     @csrf
     @method('PUT')
 

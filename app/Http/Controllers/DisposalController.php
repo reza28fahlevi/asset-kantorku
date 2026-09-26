@@ -9,6 +9,7 @@ use App\Models\Asset;
 use App\Models\DisposalRequest;
 use App\Services\AttachmentService;
 use App\Services\DisposalService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -75,7 +76,7 @@ class DisposalController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $this->authorize('create', DisposalRequest::class);
 
@@ -91,9 +92,9 @@ class DisposalController extends Controller
 
         $disposal = $this->service->create($data, $request->user(), $request->input('action') === 'submit');
 
-        return redirect()->route('disposals.show', $disposal)->with('success', $disposal->status === DisposalStatus::Draft
+        return $this->respond($request, $disposal->status === DisposalStatus::Draft
             ? "Draft {$disposal->request_no} tersimpan."
-            : "{$disposal->request_no} diajukan. Aset dikunci sebagai Menunggu Disposal.");
+            : "{$disposal->request_no} diajukan. Aset dikunci sebagai Menunggu Disposal.", route('disposals.show', $disposal));
     }
 
     public function show(DisposalRequest $disposal): View
@@ -108,24 +109,24 @@ class DisposalController extends Controller
         return view('disposals.show', compact('disposal'));
     }
 
-    public function submit(Request $request, DisposalRequest $disposal): RedirectResponse
+    public function submit(Request $request, DisposalRequest $disposal): JsonResponse|RedirectResponse
     {
         $this->authorize('submit', $disposal);
         $this->service->submit($disposal, $request->user());
 
-        return back()->with('success', "{$disposal->request_no} berhasil diajukan.");
+        return $this->respond($request, "{$disposal->request_no} berhasil diajukan.");
     }
 
-    public function cancel(Request $request, DisposalRequest $disposal): RedirectResponse
+    public function cancel(Request $request, DisposalRequest $disposal): JsonResponse|RedirectResponse
     {
         $this->authorize('cancel', $disposal);
         $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
         $this->service->cancel($disposal, $request->user(), $data['cancel_reason'] ?? null);
 
-        return back()->with('success', "{$disposal->request_no} dibatalkan.");
+        return $this->respond($request, "{$disposal->request_no} dibatalkan.");
     }
 
-    public function execute(Request $request, DisposalRequest $disposal): RedirectResponse
+    public function execute(Request $request, DisposalRequest $disposal): JsonResponse|RedirectResponse
     {
         $this->authorize('execute', $disposal);
 
@@ -140,6 +141,6 @@ class DisposalController extends Controller
         ]);
         $this->service->execute($disposal, $data, $request->user());
 
-        return back()->with('success', 'Disposal selesai. Aset berstatus Dihapus dan histori tetap tersimpan.');
+        return $this->respond($request, 'Disposal selesai. Aset berstatus Dihapus dan histori tetap tersimpan.');
     }
 }

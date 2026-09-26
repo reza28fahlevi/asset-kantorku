@@ -14,6 +14,7 @@ use App\Models\Location;
 use App\Models\Setting;
 use App\Services\AttachmentService;
 use App\Services\LoanService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -107,7 +108,7 @@ class LoanController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $this->authorize('create', AssetLoanRequest::class);
 
@@ -123,9 +124,9 @@ class LoanController extends Controller
 
         $loan = $this->service->create($data, $request->user(), $request->input('action') === 'submit');
 
-        return redirect()->route('loans.show', $loan)->with('success', $loan->status === RequestStatus::Draft
+        return $this->respond($request, $loan->status === RequestStatus::Draft
             ? "Draft {$loan->request_no} tersimpan."
-            : "{$loan->request_no} berhasil diajukan dan menunggu approval manager peminjam.");
+            : "{$loan->request_no} berhasil diajukan dan menunggu approval manager peminjam.", route('loans.show', $loan));
     }
 
     public function show(AssetLoanRequest $loan): View
@@ -145,24 +146,24 @@ class LoanController extends Controller
         ]);
     }
 
-    public function submit(Request $request, AssetLoanRequest $loan): RedirectResponse
+    public function submit(Request $request, AssetLoanRequest $loan): JsonResponse|RedirectResponse
     {
         $this->authorize('submit', $loan);
         $this->service->submit($loan, $request->user());
 
-        return back()->with('success', "{$loan->request_no} berhasil diajukan.");
+        return $this->respond($request, "{$loan->request_no} berhasil diajukan.");
     }
 
-    public function cancel(Request $request, AssetLoanRequest $loan): RedirectResponse
+    public function cancel(Request $request, AssetLoanRequest $loan): JsonResponse|RedirectResponse
     {
         $this->authorize('cancel', $loan);
         $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
         $this->service->cancel($loan, $request->user(), $data['cancel_reason'] ?? null);
 
-        return back()->with('success', "{$loan->request_no} dibatalkan.");
+        return $this->respond($request, "{$loan->request_no} dibatalkan.");
     }
 
-    public function checkout(Request $request, AssetLoanRequest $loan): RedirectResponse
+    public function checkout(Request $request, AssetLoanRequest $loan): JsonResponse|RedirectResponse
     {
         $this->authorize('checkout', $loan);
 
@@ -175,10 +176,10 @@ class LoanController extends Controller
         ]);
         $this->service->checkout($loan, $data, $request->user());
 
-        return back()->with('success', 'Serah-terima peminjaman berhasil dicatat.');
+        return $this->respond($request, 'Serah-terima peminjaman berhasil dicatat.');
     }
 
-    public function returnLoan(Request $request, AssetLoan $assetLoan): RedirectResponse
+    public function returnLoan(Request $request, AssetLoan $assetLoan): JsonResponse|RedirectResponse
     {
         $this->authorize('return', $assetLoan);
 
@@ -193,10 +194,10 @@ class LoanController extends Controller
         ]);
         $this->service->returnLoan($assetLoan, $data, $request->user());
 
-        return back()->with('success', 'Pengembalian peminjaman berhasil dicatat.');
+        return $this->respond($request, 'Pengembalian peminjaman berhasil dicatat.');
     }
 
-    public function extend(Request $request, AssetLoan $assetLoan): RedirectResponse
+    public function extend(Request $request, AssetLoan $assetLoan): JsonResponse|RedirectResponse
     {
         $this->authorize('extend', $assetLoan);
 
@@ -206,14 +207,14 @@ class LoanController extends Controller
         ]);
         $extension = $this->service->requestExtension($assetLoan, $data, $request->user());
 
-        return back()->with('success', "Pengajuan perpanjangan {$extension->request_no} menunggu approval.");
+        return $this->respond($request, "Pengajuan perpanjangan {$extension->request_no} menunggu approval.");
     }
 
-    public function cancelExtension(LoanExtensionRequest $extension): RedirectResponse
+    public function cancelExtension(Request $request, LoanExtensionRequest $extension): JsonResponse|RedirectResponse
     {
         $this->authorize('cancel', $extension);
         $this->service->cancelExtension($extension);
 
-        return back()->with('success', 'Pengajuan perpanjangan dibatalkan.');
+        return $this->respond($request, 'Pengajuan perpanjangan dibatalkan.');
     }
 }

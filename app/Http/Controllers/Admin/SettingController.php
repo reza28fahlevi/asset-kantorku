@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Setting;
 use App\Services\AuditLogger;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -21,7 +22,7 @@ class SettingController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request): JsonResponse|RedirectResponse
     {
         $data = $request->validate([
             'app_company_name' => ['required', 'string', 'max:150'],
@@ -42,6 +43,6 @@ class SettingController extends Controller
         }
         AuditLogger::log('settings_updated', null, array_intersect_key($old, $new), $new);
 
-        return back()->with('success', 'Pengaturan berhasil disimpan.');
+        return $this->respond($request, 'Pengaturan berhasil disimpan.');
     }
 }

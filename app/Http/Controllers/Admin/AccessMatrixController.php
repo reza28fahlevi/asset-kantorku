@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Services\AuditLogger;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,7 @@ class AccessMatrixController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request): JsonResponse|RedirectResponse
     {
         $data = $request->validate([
             'matrix' => ['array'],
@@ -40,7 +41,7 @@ class AccessMatrixController extends Controller
         $myRoleIds = $request->user()->roles()->pluck('roles.id');
         $keepsAccess = $myRoleIds->contains(fn ($id) => in_array($manageId, array_map('intval', $matrix[$id] ?? []), true));
         if ($manageId && ! $keepsAccess) {
-            return back()->withInput()->with('error', 'Minimal satu role Anda harus tetap memiliki hak "role.manage" agar tidak kehilangan akses ke menu ini.');
+            return $this->respond($request, 'Minimal satu role Anda harus tetap memiliki hak "role.manage" agar tidak kehilangan akses ke menu ini.', status: 'error');
         }
 
         DB::transaction(function () use ($roles, $matrix) {
@@ -53,7 +54,7 @@ class AccessMatrixController extends Controller
         });
 
         return $this->reassignApprovals(
-            redirect()->route('admin.access.index')->with('success', 'Matriks otorisasi berhasil disimpan.')
+            $this->respond($request, 'Matriks otorisasi berhasil disimpan.', route('admin.access.index'))
         );
     }
 }

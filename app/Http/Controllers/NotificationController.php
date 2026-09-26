@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -26,10 +27,10 @@ class NotificationController extends Controller
         return $url && str_starts_with($url, url('/')) ? redirect($url) : redirect()->route('notifications.index');
     }
 
-    public function readAll(Request $request): RedirectResponse
+    public function readAll(Request $request): JsonResponse|RedirectResponse
     {
         $request->user()->unreadNotifications->markAsRead();
 
-        return back()->with('success', 'Semua notifikasi ditandai sudah dibaca.');
+        return $this->respond($request, 'Semua notifikasi ditandai sudah dibaca.');
     }
 }

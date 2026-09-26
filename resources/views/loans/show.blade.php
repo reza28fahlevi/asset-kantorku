@@ -140,7 +140,7 @@
     <div class="space-y-gutter">
         @can('checkout', $loanRequest)
             <x-card title="Serah-Terima Peminjaman" icon="handshake">
-                <form method="POST" action="{{ route('loans.checkout', $loanRequest) }}" enctype="multipart/form-data" class="space-y-space-md">
+                <form method="POST" data-ajax-form action="{{ route('loans.checkout', $loanRequest) }}" enctype="multipart/form-data" class="space-y-space-md">
                     @csrf
                     <x-field label="Tanggal Serah-Terima" name="checked_out_at" :required="true">
                         <input type="datetime-local" name="checked_out_at" id="checked_out_at" value="{{ old('checked_out_at', now()->format('Y-m-d\TH:i')) }}" max="{{ now()->format('Y-m-d\TH:i') }}" class="form-input" required>

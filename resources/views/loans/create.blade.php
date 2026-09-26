@@ -6,7 +6,7 @@
     <span class="material-symbols-outlined !text-[14px]">chevron_right</span><span class="text-on-surface font-semibold">Ajukan Peminjaman</span>
 @endsection
 @section('content')
-<form method="POST" action="{{ route('loans.store') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-gutter"
+<form method="POST" data-ajax-form action="{{ route('loans.store') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-gutter"
       x-data="{ start: @js(old('start_date', now()->toDateString())), due: @js(old('due_date', now()->addDays(7)->toDateString())), maxDays: {{ $maxDays }},
                 get days() { const s = new Date(this.start), d = new Date(this.due); return (isNaN(s) || isNaN(d)) ? 0 : Math.round((d - s) / 86400000) + 1; } }">
     @csrf

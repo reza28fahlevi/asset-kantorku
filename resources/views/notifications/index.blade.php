@@ -9,7 +9,7 @@
 
 @section('actions')
     @if (auth()->user()->unreadNotifications()->exists())
-        <form method="POST" action="{{ route('notifications.read-all') }}">
+        <form method="POST" data-ajax-form action="{{ route('notifications.read-all') }}">
             @csrf
             <button type="submit" class="btn btn-secondary"><span class="material-symbols-outlined !text-[18px]">done_all</span> Tandai Semua Dibaca</button>
         </form>

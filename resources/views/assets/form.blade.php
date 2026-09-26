@@ -17,7 +17,7 @@
 @endsection
 
 @section('content')
-<form method="POST" action="{{ $editing ? route('assets.update', $asset) : route('assets.store') }}"
+<form method="POST" data-ajax-form action="{{ $editing ? route('assets.update', $asset) : route('assets.store') }}"
       class="grid grid-cols-1 lg:grid-cols-3 gap-space-lg"
       x-data="{ name: @js(old('name', $asset->name)), cost: @js(old('purchase_cost', $asset->purchase_cost)) }">
     @csrf

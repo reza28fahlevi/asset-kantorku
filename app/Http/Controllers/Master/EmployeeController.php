@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -53,11 +54,11 @@ class EmployeeController extends Controller
         return $this->form(new Employee(['employment_status' => EmploymentStatus::Active]));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $employee = Employee::create($this->validated($request, null));
 
-        return redirect()->route('masters.employees.show', $employee)->with('success', 'Karyawan berhasil ditambahkan.');
+        return $this->respond($request, 'Karyawan berhasil ditambahkan.', route('masters.employees.show', $employee));
     }
 
     public function edit(Employee $employee): View
@@ -65,12 +66,12 @@ class EmployeeController extends Controller
         return $this->form($employee);
     }
 
-    public function update(Request $request, Employee $employee): RedirectResponse
+    public function update(Request $request, Employee $employee): JsonResponse|RedirectResponse
     {
         $employee->update($this->validated($request, $employee));
 
         return $this->reassignApprovals(
-            redirect()->route('masters.employees.show', $employee)->with('success', 'Data karyawan berhasil diperbarui.')
+            $this->respond($request, 'Data karyawan berhasil diperbarui.', route('masters.employees.show', $employee))
         );
     }
 

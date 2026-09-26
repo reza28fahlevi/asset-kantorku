@@ -12,6 +12,7 @@ use App\Models\Vendor;
 use App\Services\AssetExporter;
 use App\Services\AssetService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -77,11 +78,11 @@ class AssetController extends Controller
         return $this->form(new Asset(['condition' => AssetCondition::Good]));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $asset = $this->assets->register($this->validated($request, null));
 
-        return redirect()->route('assets.show', $asset)->with('success', "Aset {$asset->asset_tag} berhasil diregistrasi.");
+        return $this->respond($request, "Aset {$asset->asset_tag} berhasil diregistrasi.", route('assets.show', $asset));
     }
 
     public function edit(Asset $asset): View
@@ -91,15 +92,15 @@ class AssetController extends Controller
         return $this->form($asset);
     }
 
-    public function update(Request $request, Asset $asset): RedirectResponse
+    public function update(Request $request, Asset $asset): JsonResponse|RedirectResponse
     {
         $this->assets->update($asset, $this->validated($request, $asset));
 
-        return redirect()->route('assets.show', $asset)->with('success', 'Data aset berhasil diperbarui.');
+        return $this->respond($request, 'Data aset berhasil diperbarui.', route('assets.show', $asset));
     }
 
     /** Aksi status operasional: repair | repaired | lost | found */
-    public function changeStatus(Request $request, Asset $asset): RedirectResponse
+    public function changeStatus(Request $request, Asset $asset): JsonResponse|RedirectResponse
     {
         $data = $request->validate([
             'action' => ['required', Rule::in(['repair', 'repaired', 'lost', 'found'])],
@@ -109,7 +110,7 @@ class AssetController extends Controller
 
         $this->assets->changeOperationalStatus($asset, $data['action'], $data['notes'] ?? null, $data['condition'] ?? null);
 
-        return back()->with('success', 'Status aset berhasil diperbarui.');
+        return $this->respond($request, 'Status aset berhasil diperbarui.');
     }
 
     /** Pencarian aset tersedia (AJAX) untuk form assignment/peminjaman/disposal. */

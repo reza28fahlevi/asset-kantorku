@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AuditLogger;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -40,7 +41,7 @@ class UserController extends Controller
         return $this->form(new User(['is_active' => true]));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $data = $this->validated($request, null);
 
@@ -49,7 +50,7 @@ class UserController extends Controller
             $this->syncRoles($user, $data['roles']);
         });
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil dibuat.');
+        return $this->respond($request, 'Akun pengguna berhasil dibuat.', route('admin.users.index'));
     }
 
     public function edit(User $user): View
@@ -57,7 +58,7 @@ class UserController extends Controller
         return $this->form($user->load('roles'));
     }
 
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(Request $request, User $user): JsonResponse|RedirectResponse
     {
         $data = $this->validated($request, $user);
         if (blank($data['password'] ?? null)) {
@@ -65,7 +66,7 @@ class UserController extends Controller
         }
 
         if ($user->is($request->user()) && ! $data['is_active']) {
-            return back()->withInput()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+            return $this->respond($request, 'Anda tidak dapat menonaktifkan akun Anda sendiri.', status: 'error');
         }
 
         DB::transaction(function () use ($user, $data) {
@@ -74,7 +75,7 @@ class UserController extends Controller
         });
 
         return $this->reassignApprovals(
-            redirect()->route('admin.users.index')->with('success', 'Akun pengguna berhasil diperbarui.')
+            $this->respond($request, 'Akun pengguna berhasil diperbarui.', route('admin.users.index'))
         );
     }
 

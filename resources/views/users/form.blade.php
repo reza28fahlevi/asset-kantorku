@@ -17,7 +17,7 @@
 @endsection
 
 @section('content')
-<form method="POST" action="{{ $editing ? route('admin.users.update', $user) : route('admin.users.store') }}"
+<form method="POST" data-ajax-form action="{{ $editing ? route('admin.users.update', $user) : route('admin.users.store') }}"
       class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
     @csrf
     @if ($editing) @method('PUT') @endif

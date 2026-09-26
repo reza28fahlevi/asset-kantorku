@@ -57,8 +57,8 @@
 
         @can('execute', $disposal)
             <x-card title="Eksekusi Disposal" icon="gavel">
-                <form method="POST" action="{{ route('disposals.execute', $disposal) }}" enctype="multipart/form-data" class="space-y-space-md"
-                      onsubmit="return confirm('Eksekusi disposal? Aset akan berstatus Dihapus dan tidak dapat dikembalikan.')">
+                <form method="POST" data-ajax-form action="{{ route('disposals.execute', $disposal) }}" enctype="multipart/form-data" class="space-y-space-md"
+                      data-confirm="Eksekusi disposal? Aset akan berstatus Dihapus dan tidak dapat dikembalikan.">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                         <x-field label="Tanggal Eksekusi" name="executed_at" :required="true">

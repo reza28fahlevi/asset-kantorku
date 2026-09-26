@@ -195,6 +195,7 @@
 
     $(document).on('submit', 'form', function (e) {
         if (e.isDefaultPrevented()) return; // dibatalkan onsubmit="return confirm()" / validasi Alpine
+        if (this.hasAttribute('data-ajax-form')) return; // ditangani ajax-form.js (JSON + SweetAlert)
         var form = this;
         var action = form.getAttribute('action') || location.href;
         var url = new URL(action, location.href).href;

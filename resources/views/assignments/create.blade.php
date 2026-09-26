@@ -6,7 +6,7 @@
     <span class="material-symbols-outlined !text-[14px]">chevron_right</span><span class="text-on-surface font-semibold">Buat Permintaan</span>
 @endsection
 @section('content')
-<form method="POST" action="{{ route('assignments.store') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<form method="POST" data-ajax-form action="{{ route('assignments.store') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
     @csrf
     <div class="lg:col-span-2 space-y-gutter">
         <x-card title="Informasi Penugasan" icon="assignment_ind">

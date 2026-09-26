@@ -27,7 +27,7 @@
 @endphp
 
 @section('content')
-<form method="POST" action="{{ $editing ? route('procurements.update', $procurement) : route('procurements.store') }}" enctype="multipart/form-data"
+<form method="POST" data-ajax-form action="{{ $editing ? route('procurements.update', $procurement) : route('procurements.store') }}" enctype="multipart/form-data"
       x-data="procurementForm(@js($oldItems))">
     @csrf
     @if ($editing) @method('PUT') @endif

@@ -18,7 +18,7 @@
 @endphp
 
 @section('content')
-<form method="POST" action="{{ route('procurements.receive', $procurement) }}" enctype="multipart/form-data">
+<form method="POST" data-ajax-form data-confirm="Simpan penerimaan dan registrasi aset?" data-confirm-button="Ya, simpan" action="{{ route('procurements.receive', $procurement) }}" enctype="multipart/form-data">
     @csrf
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start">
         <div class="lg:col-span-2 space-y-space-lg">
@@ -127,8 +127,7 @@
                     <span class="material-symbols-outlined !text-[18px] text-status-assigned">info</span>
                     Setiap unit yang diterima akan otomatis diregistrasi sebagai aset baru.
                 </p>
-                <button type="submit" class="btn btn-success w-full justify-center" @disabled($openItems->isEmpty())
-                        onclick="return confirm('Simpan penerimaan dan registrasi aset?')">
+                <button type="submit" class="btn btn-success w-full justify-center" @disabled($openItems->isEmpty())>
                     <span class="material-symbols-outlined !text-[18px]">inventory</span> Simpan Penerimaan
                 </button>
                 <a href="{{ route('procurements.show', $procurement) }}" class="btn btn-ghost w-full justify-center">Batal</a>

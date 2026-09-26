@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Services\AuditLogger;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -27,16 +28,18 @@ class RoleController extends Controller
         return $this->form(new Role());
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $data = $this->validated($request, null);
 
-        DB::transaction(function () use ($data) {
+        $role = DB::transaction(function () use ($data) {
             $role = Role::create(Arr::except($data, 'permissions'));
             $this->syncPermissions($role, $data['permissions'] ?? []);
+
+            return $role;
         });
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role berhasil dibuat.');
+        return $this->respond($request, "Role {$role->display_name} berhasil dibuat.", route('admin.roles.index'));
     }
 
     public function edit(Role $role): View
@@ -44,7 +47,7 @@ class RoleController extends Controller
         return $this->form($role->load('permissions'));
     }
 
-    public function update(Request $request, Role $role): RedirectResponse
+    public function update(Request $request, Role $role): JsonResponse|RedirectResponse
     {
         $data = $this->validated($request, $role);
         if ($role->is_system) {
@@ -57,22 +60,22 @@ class RoleController extends Controller
         });
 
         return $this->reassignApprovals(
-            redirect()->route('admin.roles.index')->with('success', 'Role berhasil diperbarui.')
+            $this->respond($request, "Role {$role->display_name} berhasil diperbarui.", route('admin.roles.index'))
         );
     }
 
-    public function destroy(Role $role): RedirectResponse
+    public function destroy(Request $request, Role $role): JsonResponse|RedirectResponse
     {
         if ($role->is_system) {
-            return back()->with('error', 'Role bawaan sistem tidak dapat dihapus.');
+            return $this->respond($request, 'Role bawaan sistem tidak dapat dihapus.', status: 'error');
         }
         if ($role->users()->exists()) {
-            return back()->with('error', 'Role masih dipakai oleh pengguna.');
+            return $this->respond($request, 'Role masih dipakai oleh pengguna.', status: 'error');
         }
 
         $role->delete();
 
-        return back()->with('success', 'Role berhasil dihapus.');
+        return $this->respond($request, "Role {$role->display_name} berhasil dihapus.", route('admin.roles.index'));
     }
 
     private function form(Role $role): View

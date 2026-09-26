@@ -16,7 +16,8 @@
 @endsection
 
 @section('content')
-<form method="POST" action="{{ $editing ? route('admin.roles.update', $role) : route('admin.roles.store') }}"
+{{-- data-ajax-form: simpan via AJAX, hasil ditampilkan SweetAlert, error validasi tampil per field --}}
+<form method="POST" action="{{ $editing ? route('admin.roles.update', $role) : route('admin.roles.store') }}" data-ajax-form
       x-data="{ count: {{ count($selected) }}, recount() { this.count = this.$root.querySelectorAll('input[name=\'permissions[]\']:checked').length } }"
       @change="recount()"
       class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">

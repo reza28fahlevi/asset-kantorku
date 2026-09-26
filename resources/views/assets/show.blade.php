@@ -210,9 +210,9 @@
                                     <button type="button" class="btn {{ $btn }} w-full" @click="open = open === '{{ $action }}' ? null : '{{ $action }}'">
                                         <span class="material-symbols-outlined !text-[18px]">{{ $icon }}</span> {{ $label }}
                                     </button>
-                                    <form method="POST" action="{{ route('assets.status', $asset) }}" x-show="open === '{{ $action }}'" x-cloak
+                                    <form method="POST" data-ajax-form action="{{ route('assets.status', $asset) }}" x-show="open === '{{ $action }}'" x-cloak
                                           class="mt-space-sm space-y-space-sm p-space-md rounded border border-border-subtle bg-surface-container-low"
-                                          onsubmit="return confirm('Yakin melakukan aksi: {{ $label }}?')">
+                                          data-confirm="Yakin melakukan aksi: {{ $label }}?">
                                         @csrf
                                         <input type="hidden" name="action" value="{{ $action }}">
                                         @if (in_array($action, ['repaired', 'found'], true))

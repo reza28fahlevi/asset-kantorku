@@ -106,7 +106,7 @@
     <div class="space-y-gutter">
         @can('handover', $assignment)
             <x-card title="Serah-Terima Aset" icon="handshake">
-                <form method="POST" action="{{ route('assignments.handover', $assignment) }}" enctype="multipart/form-data" class="space-y-space-md">
+                <form method="POST" data-ajax-form action="{{ route('assignments.handover', $assignment) }}" enctype="multipart/form-data" class="space-y-space-md">
                     @csrf
                     <x-field label="Tanggal Serah-Terima" name="assigned_at" :required="true">
                         <input type="datetime-local" name="assigned_at" id="assigned_at" value="{{ old('assigned_at', now()->format('Y-m-d\TH:i')) }}" max="{{ now()->format('Y-m-d\TH:i') }}" class="form-input" required>

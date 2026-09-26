@@ -202,7 +202,7 @@
                     <dt>Dicatat oleh</dt><dd>{{ $procurement->orderedBy?->name ?? '-' }}</dd>
                 </dl>
             @elseif (auth()->user()->can('order', $procurement))
-                <form method="POST" action="{{ route('procurements.order', $procurement) }}" class="space-y-space-md">
+                <form method="POST" data-ajax-form action="{{ route('procurements.order', $procurement) }}" class="space-y-space-md">
                     @csrf
                     <x-field label="Vendor" name="vendor_id" :required="true">
                         <select id="vendor_id" name="vendor_id" class="form-input" required>
@@ -231,7 +231,7 @@
         @can('close', $procurement)
             <x-card title="Tutup Procurement" icon="task_alt">
                 <p class="text-body-sm text-on-surface-variant mb-space-md">Barang diterima sebagian. Tutup permintaan bila sisa barang tidak akan dikirim.</p>
-                <form method="POST" action="{{ route('procurements.close', $procurement) }}" class="space-y-space-md" onsubmit="return confirm('Tutup procurement ini? Sisa barang tidak akan diterima lagi.')">
+                <form method="POST" data-ajax-form action="{{ route('procurements.close', $procurement) }}" class="space-y-space-md" data-confirm="Tutup procurement ini? Sisa barang tidak akan diterima lagi.">
                     @csrf
                     <x-field label="Catatan Penutupan" name="closing_note" :required="true">
                         <textarea id="closing_note" name="closing_note" rows="3" maxlength="2000" class="form-input" required>{{ old('closing_note') }}</textarea>

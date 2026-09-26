@@ -2,7 +2,7 @@
 <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-space-md text-left whitespace-normal" @keydown.escape.window="open = false">
     <div class="bg-surface-card rounded-lg shadow-xl w-full max-w-lg" @click.outside="open = false">
         <div class="card-header"><h3 class="card-title">{{ $title }}</h3></div>
-        <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="card-body space-y-space-md">
+        <form method="POST" data-ajax-form action="{{ $action }}" enctype="multipart/form-data" class="card-body space-y-space-md">
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
                 <x-field label="Tanggal Kembali" :required="true">

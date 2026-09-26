@@ -35,7 +35,11 @@
                             <td class="text-right whitespace-nowrap">
                                 <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-ghost btn-sm">Ubah</a>
                                 @if (! $role->is_system && $role->users_count === 0)
-                                    <x-confirm-form :action="route('admin.roles.destroy', $role)" method="DELETE" confirm="Hapus role {{ $role->display_name }}?" button="btn btn-ghost btn-sm text-error">Hapus</x-confirm-form>
+                                    <form method="POST" action="{{ route('admin.roles.destroy', $role) }}" class="inline" data-ajax-form
+                                          data-confirm="Hapus role {{ $role->display_name }}?" data-confirm-text="Role yang dihapus tidak dapat dikembalikan." data-confirm-button="Ya, hapus">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-ghost btn-sm text-error">Hapus</button>
+                                    </form>
                                 @endif
                             </td>
                         </tr>

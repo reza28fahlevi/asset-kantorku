@@ -121,6 +121,41 @@ class MasterAdminCrudTest extends TestCase
         $this->assertNull(Role::find($role->id));
     }
 
+    public function test_role_crud_via_ajax_json_untuk_sweetalert(): void
+    {
+        $admin = $this->user('sysadmin');
+        $perm = Permission::where('name', 'asset.view')->value('id');
+
+        // Validasi gagal → 422 + errors per field
+        $this->actingAs($admin)->postJson(route('admin.roles.store'), ['name' => 'Bukan Slug!', 'display_name' => ''])
+            ->assertStatus(422)->assertJsonValidationErrors(['name', 'display_name']);
+
+        // Simpan → JSON sukses + redirect
+        $this->actingAs($admin)->postJson(route('admin.roles.store'), [
+            'name' => 'ajax_role', 'display_name' => 'Ajax Role', 'permissions' => [$perm],
+        ])->assertOk()->assertJson(['status' => 'success', 'message' => 'Role Ajax Role berhasil dibuat.', 'redirect' => route('admin.roles.index')]);
+        $role = Role::where('name', 'ajax_role')->firstOrFail();
+
+        $this->actingAs($admin)->putJson(route('admin.roles.update', $role), [
+            'name' => 'ajax_role', 'display_name' => 'Ajax Role 2', 'permissions' => [],
+        ])->assertOk()->assertJsonPath('status', 'success')->assertJsonPath('message', 'Role Ajax Role 2 berhasil diperbarui.');
+        $this->assertSame(0, $role->permissions()->count());
+
+        // Hapus role bawaan ditolak → 422 status error
+        $system = Role::where('name', 'staff')->firstOrFail();
+        $this->actingAs($admin)->deleteJson(route('admin.roles.destroy', $system))
+            ->assertStatus(422)->assertJson(['status' => 'error', 'message' => 'Role bawaan sistem tidak dapat dihapus.']);
+
+        $this->actingAs($admin)->deleteJson(route('admin.roles.destroy', $role))->assertOk()->assertJsonPath('status', 'success');
+        $this->assertNull(Role::find($role->id));
+
+        // Tanpa hak akses → 403
+        $this->actingAs($this->user('staff'))->postJson(route('admin.roles.store'), ['name' => 'x', 'display_name' => 'x'])->assertForbidden();
+
+        // Halaman memuat form AJAX & konfirmasi hapus
+        $this->actingAs($admin)->get(route('admin.roles.create'))->assertOk()->assertSee('data-ajax-form', false);
+    }
+
     public function test_settings_and_profile_password(): void
     {
         $admin = $this->user('sysadmin');

@@ -6,6 +6,7 @@ use App\Enums\ApprovalStatus;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalStep;
 use App\Services\ApprovalService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -51,23 +52,23 @@ class ApprovalController extends Controller
         return view('approvals.index', compact('steps', 'tab', 'pendingCount'));
     }
 
-    public function approve(Request $request, ApprovalStep $step): RedirectResponse
+    public function approve(Request $request, ApprovalStep $step): JsonResponse|RedirectResponse
     {
         $this->authorize('decide', $step);
         $data = $request->validate(['comment' => ['nullable', 'string', 'max:2000']]);
 
         $this->approvals->decide($step, $request->user(), true, $data['comment'] ?? null);
 
-        return back()->with('success', 'Permintaan disetujui.');
+        return $this->respond($request, 'Permintaan disetujui.');
     }
 
-    public function reject(Request $request, ApprovalStep $step): RedirectResponse
+    public function reject(Request $request, ApprovalStep $step): JsonResponse|RedirectResponse
     {
         $this->authorize('decide', $step);
         $data = $request->validate(['comment' => ['required', 'string', 'min:5', 'max:2000']]);
 
         $this->approvals->decide($step, $request->user(), false, $data['comment']);
 
-        return back()->with('success', 'Permintaan ditolak.');
+        return $this->respond($request, 'Permintaan ditolak.');
     }
 }

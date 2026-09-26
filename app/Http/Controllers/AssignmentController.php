@@ -11,6 +11,7 @@ use App\Models\Employee;
 use App\Models\Location;
 use App\Services\AssignmentService;
 use App\Services\AttachmentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -101,7 +102,7 @@ class AssignmentController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $this->authorize('create', AssignmentRequest::class);
 
@@ -116,9 +117,9 @@ class AssignmentController extends Controller
 
         $assignment = $this->service->create($data, $request->user(), $request->input('action') === 'submit');
 
-        return redirect()->route('assignments.show', $assignment)->with('success', $assignment->status === RequestStatus::Draft
+        return $this->respond($request, $assignment->status === RequestStatus::Draft
             ? "Draft {$assignment->request_no} tersimpan."
-            : "{$assignment->request_no} berhasil diajukan dan menunggu approval manager penerima.");
+            : "{$assignment->request_no} berhasil diajukan dan menunggu approval manager penerima.", route('assignments.show', $assignment));
     }
 
     public function show(AssignmentRequest $assignment): View
@@ -137,24 +138,24 @@ class AssignmentController extends Controller
         ]);
     }
 
-    public function submit(Request $request, AssignmentRequest $assignment): RedirectResponse
+    public function submit(Request $request, AssignmentRequest $assignment): JsonResponse|RedirectResponse
     {
         $this->authorize('submit', $assignment);
         $this->service->submit($assignment, $request->user());
 
-        return back()->with('success', "{$assignment->request_no} berhasil diajukan.");
+        return $this->respond($request, "{$assignment->request_no} berhasil diajukan.");
     }
 
-    public function cancel(Request $request, AssignmentRequest $assignment): RedirectResponse
+    public function cancel(Request $request, AssignmentRequest $assignment): JsonResponse|RedirectResponse
     {
         $this->authorize('cancel', $assignment);
         $data = $request->validate(['cancel_reason' => ['nullable', 'string', 'max:1000']]);
         $this->service->cancel($assignment, $request->user(), $data['cancel_reason'] ?? null);
 
-        return back()->with('success', "{$assignment->request_no} dibatalkan.");
+        return $this->respond($request, "{$assignment->request_no} dibatalkan.");
     }
 
-    public function handover(Request $request, AssignmentRequest $assignment): RedirectResponse
+    public function handover(Request $request, AssignmentRequest $assignment): JsonResponse|RedirectResponse
     {
         $this->authorize('handover', $assignment);
 
@@ -168,10 +169,10 @@ class AssignmentController extends Controller
         ]);
         $this->service->handover($assignment, $data, $request->user());
 
-        return back()->with('success', 'Serah-terima berhasil dicatat. Aset kini berstatus Ditugaskan.');
+        return $this->respond($request, 'Serah-terima berhasil dicatat. Aset kini berstatus Ditugaskan.');
     }
 
-    public function returnAsset(Request $request, AssetAssignment $assetAssignment): RedirectResponse
+    public function returnAsset(Request $request, AssetAssignment $assetAssignment): JsonResponse|RedirectResponse
     {
         $this->authorize('return', $assetAssignment);
 
@@ -186,6 +187,6 @@ class AssignmentController extends Controller
         ]);
         $this->service->returnAsset($assetAssignment, $data, $request->user());
 
-        return back()->with('success', 'Pengembalian aset berhasil dicatat.');
+        return $this->respond($request, 'Pengembalian aset berhasil dicatat.');
     }
 }

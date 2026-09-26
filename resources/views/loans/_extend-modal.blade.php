@@ -2,7 +2,7 @@
 <div x-show="extend" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-space-md text-left whitespace-normal" @keydown.escape.window="extend = false">
     <div class="bg-surface-card rounded-lg shadow-xl w-full max-w-md" @click.outside="extend = false">
         <div class="card-header"><h3 class="card-title">Perpanjang {{ $loan->asset->asset_tag }} &mdash; {{ $loan->asset->name }}</h3></div>
-        <form method="POST" action="{{ route('loans.extend', $loan) }}" class="card-body space-y-space-md">
+        <form method="POST" data-ajax-form action="{{ route('loans.extend', $loan) }}" class="card-body space-y-space-md">
             @csrf
             <p class="text-body-sm text-on-surface-variant">Jatuh tempo saat ini: <strong class="text-on-surface">{{ $loan->due_at->format('d M Y') }}</strong>. Perpanjangan memerlukan approval.</p>
             <x-field label="Jatuh Tempo Baru" :required="true">

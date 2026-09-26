@@ -22,7 +22,7 @@
 @endphp
 
 @section('content')
-<form method="POST" action="{{ route('disposals.store') }}" enctype="multipart/form-data"
+<form method="POST" data-ajax-form action="{{ route('disposals.store') }}" enctype="multipart/form-data"
       x-data="disposalForm(@js($initial), @js((int) old('asset_id', 0)))"
       class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
     @csrf
