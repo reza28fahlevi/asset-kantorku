@@ -9,10 +9,12 @@ use App\Models\AssetCategory;
 use App\Models\Department;
 use App\Models\Location;
 use App\Models\Vendor;
+use App\Services\AssetExporter;
 use App\Services\AssetService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -38,30 +40,21 @@ class AssetController extends Controller
         ]);
     }
 
-    /** Export register aset (CSV) sesuai filter & hak akses. */
-    public function export(Request $request): StreamedResponse
+    /** Export register aset (?format=csv|xlsx|pdf) sesuai filter & hak akses. */
+    public function export(Request $request): Response|StreamedResponse
     {
         abort_unless($request->user()->hasPermission('report.view'), 403);
+        $format = $request->validate(['format' => ['nullable', Rule::in(['csv', 'xlsx', 'pdf'])]])['format'] ?? 'csv';
 
-        $query = $this->filtered($request)->with('category', 'location', 'department', 'activeAssignment.employee', 'activeLoan.borrower')->orderBy('asset_tag');
-        $filename = 'register-aset-'.now()->format('Ymd-His').'.csv';
+        // Ringkasan filter aktif untuk judul dokumen
+        $filters = array_filter([
+            $request->query('q') ? 'Cari "'.$request->query('q').'"' : null,
+            $request->query('status') ? 'Status '.(AssetStatus::tryFrom($request->query('status'))?->label() ?? $request->query('status')) : null,
+            $request->query('category_id') ? 'Kategori '.AssetCategory::find($request->query('category_id'))?->name : null,
+            $request->query('location_id') ? 'Lokasi '.Location::find($request->query('location_id'))?->name : null,
+        ]);
 
-        return response()->streamDownload(function () use ($query) {
-            $out = fopen('php://output', 'w');
-            fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Dibuat pada', now()->format('Y-m-d H:i:s')]);
-            fputcsv($out, ['Asset Tag', 'Nama', 'Kategori', 'Serial Number', 'Status', 'Kondisi', 'Lokasi', 'Departemen', 'Pemegang', 'Tgl Beli', 'Nilai Beli', 'Garansi s.d.']);
-            $query->chunk(500, function ($chunk) use ($out) {
-                foreach ($chunk as $a) {
-                    fputcsv($out, [
-                        $a->asset_tag, $a->name, $a->category->name, $a->serial_number, $a->status->label(), $a->condition->label(),
-                        $a->location->name, $a->department?->name, $a->currentHolder()?->name,
-                        $a->purchase_date?->format('Y-m-d'), $a->purchase_cost, $a->warranty_end_date?->format('Y-m-d'),
-                    ]);
-                }
-            });
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+        return (new AssetExporter($this->filtered($request), array_values($filters)))->download($format);
     }
 
     public function show(Asset $asset): View

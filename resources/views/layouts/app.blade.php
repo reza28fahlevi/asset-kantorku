@@ -62,7 +62,7 @@
 <html lang="id">
 <head>
     @include('layouts.partials.head')
-    <script src="{{ asset('js/ajax-nav.js') }}?v=1"></script>
+    <script src="{{ asset('js/ajax-nav.js') }}?v=2"></script>
     @stack('head')
     {{-- Terapkan status sidebar tersembunyi sebelum Alpine aktif agar tidak berkedip saat halaman dimuat --}}
     <script>try { if (localStorage.getItem('sidebar-hidden') === '1') document.documentElement.classList.add('sb-hidden'); } catch (e) {}</script>

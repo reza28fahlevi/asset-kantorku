@@ -19,7 +19,8 @@
 @endphp
 
 @section('content')
-<div class="space-y-space-lg">
+{{-- data-ajax-region: tab status, KPI, filter & pagination hanya memperbarui area ini via AJAX --}}
+<div id="loan-list" data-ajax-region class="space-y-space-lg">
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
         <x-stat label="Total Pengajuan" :value="number_format($totalCount, 0, ',', '.')" icon="schedule" color="neutral" :href="$statusUrl(null)" hint="Sesuai cakupan & filter"/>
         <x-stat label="Menunggu Approval" :value="number_format($statusCounts[RequestStatus::PendingApproval->value] ?? 0, 0, ',', '.')" icon="hourglass_top" color="pending" :href="$statusUrl(RequestStatus::PendingApproval->value)"/>
@@ -39,7 +40,7 @@
     </div>
 
     <x-card title="Daftar Pengajuan Peminjaman" icon="schedule" :padding="false">
-        <form method="GET" class="flex flex-wrap items-end gap-space-sm px-space-lg py-space-md border-b border-border-subtle">
+        <form method="GET" action="{{ route('loans.index') }}" data-auto-submit class="flex flex-wrap items-end gap-space-sm px-space-lg py-space-md border-b border-border-subtle">
             <div class="flex-1 min-w-[220px]">
                 <label class="form-label" for="q">Cari</label>
                 <input type="search" id="q" name="q" value="{{ request('q') }}" class="form-input" placeholder="No. permintaan, pemohon, peminjam, tag aset...">

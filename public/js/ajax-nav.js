@@ -7,6 +7,11 @@
  *
  * Kecualikan elemen dengan atribut data-no-ajax (pada link, form, atau pembungkusnya).
  * Halaman dapat mendaftarkan pembersihan (mis. clearInterval) lewat AppNav.onLeave(fn).
+ *
+ * Mode region: link/form GET di dalam elemen [data-ajax-region] (ber-id) yang menuju halaman
+ * yang sama (path sama, query berbeda — tab status, filter, pagination) hanya memperbarui
+ * elemen tersebut, tanpa scroll ke atas. Form dengan [data-auto-submit] dikirim otomatis saat
+ * select/tanggal berubah dan saat mengetik di kolom pencarian (debounce).
  */
 (function ($) {
     'use strict';
@@ -79,7 +84,8 @@
                 var finalUrl = (xhrRef && xhrRef.responseURL) || url;
                 var type = jq.getResponseHeader('Content-Type') || '';
                 if (type.indexOf('text/html') === -1) { location.href = finalUrl; return; }
-                if (!swap(html)) { location.href = finalUrl; return; } // mis. halaman login / error penuh
+                var swapped = opts.region ? (swapRegion(html, opts.region) || swap(html)) : swap(html);
+                if (!swapped) { location.href = finalUrl; return; } // mis. halaman login / error penuh
 
                 var method = (opts.method || 'GET').toUpperCase();
                 if (opts.replace || opts.pop) {
@@ -89,7 +95,7 @@
                 } else {
                     history.pushState({ ajaxNav: true }, '', finalUrl);
                 }
-                if (!opts.keepScroll) window.scrollTo(0, 0);
+                if (!opts.keepScroll && !opts.region) window.scrollTo(0, 0);
             })
             .fail(function (jq, status) {
                 if (status === 'abort') return;
@@ -102,7 +108,42 @@
                 }
                 location.href = url;
             })
-            .always(function () { current = null; doneProgress(); });
+            .always(function () {
+                current = null;
+                doneProgress();
+                if (opts.region) $('#' + opts.region).removeClass('opacity-60 pointer-events-none');
+            });
+        if (opts.region) $('#' + opts.region).addClass('opacity-60 pointer-events-none transition-opacity');
+    }
+
+    /** Tukar hanya isi satu region; fokus & posisi kursor input dipertahankan. */
+    function swapRegion(html, id) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var fresh = doc.getElementById(id);
+        var $region = $('#' + id);
+        if (!fresh || !$region.length) return false;
+
+        var active = document.activeElement;
+        var focusName = active && $region[0].contains(active) ? active.getAttribute('name') : null;
+        var caret = focusName && typeof active.selectionStart === 'number' ? active.selectionStart : null;
+
+        document.title = doc.title;
+        $region.html(fresh.innerHTML);
+
+        if (focusName) {
+            var el = $region.find('[name="' + focusName + '"]')[0];
+            if (el) {
+                el.focus();
+                if (caret !== null) { try { el.setSelectionRange(caret, caret); } catch (e) {} }
+            }
+        }
+        return true;
+    }
+
+    /** Region tujuan bila elemen berada di [data-ajax-region] dan URL-nya halaman yang sama. */
+    function regionFor(el, url) {
+        var region = $(el).closest('[data-ajax-region]').attr('id');
+        return region && new URL(url, location.href).pathname === location.pathname ? region : null;
     }
 
     /** Tukar isi halaman dengan dokumen baru. false bila dokumen bukan layout aplikasi. */
@@ -146,7 +187,7 @@
         if (a.pathname === location.pathname && a.search === location.search && a.hash) return;
 
         e.preventDefault();
-        visit(a.href, { method: 'GET' });
+        visit(a.href, { method: 'GET', region: regionFor(a, a.href) });
     });
 
     $(document).on('submit', 'form', function (e) {
@@ -165,7 +206,7 @@
             if (submitter && submitter.name) params.push({ name: submitter.name, value: submitter.value });
             var target = new URL(url);
             target.search = $.param(params.filter(function (p) { return p.value !== ''; }));
-            visit(target.href, { method: 'GET' });
+            visit(target.href, { method: 'GET', region: regionFor(form, target.href) });
             return;
         }
 
@@ -173,6 +214,20 @@
         if (submitter && submitter.name) data.append(submitter.name, submitter.value);
         $(form).find('[type=submit]').prop('disabled', true);
         visit(url, { method: 'POST', data: data });
+    });
+
+    // Form filter otomatis: kirim saat select/tanggal berubah, dan saat mengetik (debounce 400 ms)
+    var typingTimer = null;
+    function autoSubmit(form) {
+        if (form.requestSubmit) form.requestSubmit(); else $(form).trigger('submit');
+    }
+    $(document).on('change', 'form[data-auto-submit] select, form[data-auto-submit] input[type=date]', function () {
+        autoSubmit(this.form);
+    });
+    $(document).on('input', 'form[data-auto-submit] input[type=search]', function () {
+        var form = this.form;
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(function () { autoSubmit(form); }, 400);
     });
 
     window.addEventListener('popstate', function (e) {

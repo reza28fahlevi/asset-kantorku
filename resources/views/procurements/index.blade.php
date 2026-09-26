@@ -27,7 +27,8 @@
 @endphp
 
 @section('content')
-<div class="space-y-space-lg">
+{{-- data-ajax-region: tab status, KPI, filter & pagination hanya memperbarui area ini via AJAX --}}
+<div id="procurement-list" data-ajax-region class="space-y-space-lg">
     {{-- KPI --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
         <x-stat label="Total Permintaan" :value="number_format($totalCount, 0, ',', '.')" icon="shopping_cart" color="neutral" :href="$statusUrl(null)" hint="Sesuai cakupan & filter"/>
@@ -49,7 +50,7 @@
     </div>
 
     <x-card title="Daftar Permintaan Pengadaan" icon="shopping_cart" :padding="false">
-        <form method="GET" class="px-space-lg py-space-md border-b border-border-subtle flex flex-wrap items-end gap-space-sm">
+        <form method="GET" action="{{ route('procurements.index') }}" data-auto-submit class="px-space-lg py-space-md border-b border-border-subtle flex flex-wrap items-end gap-space-sm">
             <div class="flex-1 min-w-[220px]">
                 <label class="form-label" for="q">Cari</label>
                 <input type="search" id="q" name="q" value="{{ request('q') }}" class="form-input" placeholder="No. permintaan, judul, atau nama pemohon...">

@@ -10,9 +10,22 @@
 
 @section('actions')
     @permission('report.view')
-        <a href="{{ route('assets.export', request()->query()) }}" class="btn btn-secondary">
-            <span class="material-symbols-outlined !text-[18px]">download</span> Export CSV
-        </a>
+        {{-- Export mengikuti filter yang sedang aktif --}}
+        <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+            <button type="button" class="btn btn-secondary" @click="open = !open">
+                <span class="material-symbols-outlined !text-[18px]">download</span> Export
+                <span class="material-symbols-outlined !text-[18px]">expand_more</span>
+            </button>
+            <div x-cloak x-show="open" x-transition class="absolute right-0 mt-1 w-56 card py-1 z-40">
+                @foreach ([['xlsx', 'table_view', 'Excel (.xlsx)', 'text-status-available'], ['pdf', 'picture_as_pdf', 'PDF (.pdf)', 'text-status-disposal'], ['csv', 'description', 'CSV (.csv)', 'text-outline']] as [$fmt, $icon, $label, $tone])
+                    <a href="{{ route('assets.export', [...request()->except('page'), 'format' => $fmt]) }}" @click="open = false"
+                       class="flex items-center gap-space-sm px-space-md py-space-sm text-body-sm hover:bg-surface-subtle">
+                        <span class="material-symbols-outlined !text-[18px] {{ $tone }}">{{ $icon }}</span>{{ $label }}
+                    </a>
+                @endforeach
+                <p class="px-space-md pt-1 pb-space-sm text-label-sm font-normal text-outline border-t border-border-subtle mt-1">Sesuai filter aktif. PDF maks. {{ \App\Services\AssetExporter::PDF_MAX_ROWS }} baris.</p>
+            </div>
+        </div>
     @endpermission
     @permission('asset.create')
         <a href="{{ route('assets.create') }}" class="btn btn-primary">
