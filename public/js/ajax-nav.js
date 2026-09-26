@@ -152,6 +152,9 @@
         var content = doc.getElementById('app-content');
         if (!content) return false;
 
+        // Tutup dropdown Select2 yang masih terbuka
+        if ($.fn.select2) $('.select2-hidden-accessible').select2('close');
+
         // Jalankan pembersihan halaman lama
         leaveHandlers.splice(0).forEach(function (fn) { try { fn(); } catch (e) { console.error(e); } });
 
@@ -221,7 +224,9 @@
     function autoSubmit(form) {
         if (form.requestSubmit) form.requestSubmit(); else $(form).trigger('submit');
     }
-    $(document).on('change', 'form[data-auto-submit] select, form[data-auto-submit] input[type=date]', function () {
+    $(document).on('change', 'form[data-auto-submit] select, form[data-auto-submit] input[type=date]', function (e) {
+        // Select2 memicu 'change' jQuery + event native (untuk Alpine); proses yang native saja
+        if (!e.originalEvent && $(this).hasClass('select2-hidden-accessible')) return;
         autoSubmit(this.form);
     });
     $(document).on('input', 'form[data-auto-submit] input[type=search]', function () {
