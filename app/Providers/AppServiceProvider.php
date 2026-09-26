@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
-        Paginator::useBootstrapFive();
+        Paginator::useTailwind();
 
         // Alias stabil untuk kolom polymorphic (attachments, audit_logs, notifications)
         Relation::morphMap([
