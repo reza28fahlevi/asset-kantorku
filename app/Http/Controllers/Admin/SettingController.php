@@ -17,7 +17,7 @@ class SettingController extends Controller
     {
         return view('settings.edit', [
             'settings' => Setting::query()->pluck('value', 'key'),
-            'employees' => Employee::active()->with('user')->orderBy('name')->get()
+            'employees' => Employee::active()->with('user.employee', 'department')->orderBy('name')->get()
                 ->filter(fn (Employee $e) => $e->user?->isApprover()),
         ]);
     }

@@ -35,7 +35,7 @@
                     <select name="employee_id" id="employee_id" class="form-input">
                         <option value="">Tidak terkait karyawan</option>
                         @foreach ($employees as $e)
-                            <option value="{{ $e->id }}" @selected((string) old('employee_id', $user->employee_id) === (string) $e->id)>{{ $e->employee_no }} — {{ $e->name }}</option>
+                            <option value="{{ $e->id }}" @selected((string) old('employee_id', $user->employee_id) === (string) $e->id)>{{ $e->optionLabel() }}</option>
                         @endforeach
                     </select>
                 </x-field>

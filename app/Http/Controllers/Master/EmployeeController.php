@@ -81,7 +81,7 @@ class EmployeeController extends Controller
             'employee' => $employee,
             'departments' => Department::active()->orderBy('name')->get(),
             'locations' => Location::active()->orderBy('name')->get(),
-            'managers' => Employee::active()->when($employee->exists, fn ($q) => $q->whereKeyNot($employee->id))->orderBy('name')->get(),
+            'managers' => Employee::active()->with('department')->when($employee->exists, fn ($q) => $q->whereKeyNot($employee->id))->orderBy('name')->get(),
         ]);
     }
 

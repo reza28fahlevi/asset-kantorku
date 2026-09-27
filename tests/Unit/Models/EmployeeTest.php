@@ -63,4 +63,17 @@ class EmployeeTest extends TestCase
         $this->assertSame(1, $employee->activeAssignments()->count());
         $this->assertSame(1, $employee->activeLoans()->count());
     }
+
+    public function test_option_label_nama_nomor_jabatan_departemen(): void
+    {
+        $employee = Employee::with('department')->findOrFail(5);
+        $this->assertSame(
+            "{$employee->name} ({$employee->employee_no}) - {$employee->job_title}, {$employee->department->name}",
+            $employee->optionLabel()
+        );
+
+        // Tanpa jabatan & departemen: bagian detail tidak ditampilkan
+        $this->assertSame('Tanpa Detail (EMP-X)', (new Employee(['name' => 'Tanpa Detail', 'employee_no' => 'EMP-X']))->optionLabel());
+        $this->assertSame('Hanya Jabatan (EMP-Y) - Analis', (new Employee(['name' => 'Hanya Jabatan', 'employee_no' => 'EMP-Y', 'job_title' => 'Analis']))->optionLabel());
+    }
 }

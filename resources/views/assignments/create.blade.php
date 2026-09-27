@@ -16,7 +16,7 @@
                         <select name="recipient_employee_id" id="recipient_employee_id" class="form-input">
                             <option value="">- Diri sendiri -</option>
                             @foreach ($employees as $e)
-                                <option value="{{ $e->id }}" @selected(old('recipient_employee_id') == $e->id)>{{ $e->name }}{{ $e->department ? ' - '.$e->department->name : '' }}</option>
+                                <option value="{{ $e->id }}" @selected(old('recipient_employee_id') == $e->id)>{{ $e->optionLabel() }}</option>
                             @endforeach
                         </select>
                     </x-field>

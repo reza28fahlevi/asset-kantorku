@@ -63,6 +63,17 @@ class Employee extends Model
         return $this->hasMany(AssetLoan::class, 'borrower_employee_id')->active();
     }
 
+    /**
+     * Label seragam untuk pilihan karyawan di dropdown:
+     * "Nama (No. Karyawan) - Jabatan, Departemen". Muat relasi department agar tidak N+1.
+     */
+    public function optionLabel(): string
+    {
+        $detail = collect([$this->job_title, $this->department?->name])->filter()->implode(', ');
+
+        return "{$this->name} ({$this->employee_no})".($detail !== '' ? " - {$detail}" : '');
+    }
+
     public function isActive(): bool
     {
         return $this->employment_status === EmploymentStatus::Active;

@@ -29,7 +29,7 @@
                     <option value="">Tidak ada</option>
                     @foreach ($employees as $e)
                         <option value="{{ $e->id }}" @selected((string) old('approval_escalation_employee_id', $settings['approval.escalation_employee_id'] ?? '') === (string) $e->id)>
-                            {{ $e->name }} ({{ $e->employee_no }})
+                            {{ $e->optionLabel() }}
                         </option>
                     @endforeach
                 </select>
