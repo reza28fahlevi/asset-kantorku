@@ -10,9 +10,9 @@
 @endsection
 
 @section('actions')
-    <button type="button" class="btn btn-primary" data-modal="#settings-modal">
+    <!-- <button type="button" class="btn btn-primary" data-modal="#settings-modal">
         <span class="material-symbols-outlined !text-[18px]">edit</span> Ubah Pengaturan
-    </button>
+    </button> -->
 @endsection
 
 @section('content')
