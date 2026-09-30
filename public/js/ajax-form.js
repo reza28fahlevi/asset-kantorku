@@ -11,6 +11,8 @@
  *   data-confirm="Judul"            konfirmasi SweetAlert sebelum kirim (mis. hapus)
  *   data-confirm-text="Keterangan"  teks tambahan dialog konfirmasi
  *   data-confirm-button="Ya, hapus" label tombol konfirmasi
+ * Form di dalam modal (ajax-modal.js): setelah sukses modal ditutup dan halaman aktif dimuat ulang
+ * (redirect dari server diabaikan).
  */
 (function ($) {
     'use strict';
@@ -93,7 +95,13 @@
         });
 
         var $first = $form.find('.js-ajax-error').first();
-        if ($first.length) $('html, body').animate({ scrollTop: Math.max(0, $first.offset().top - 140) }, 250);
+        if (!$first.length) return;
+        var $scroller = $form.closest('#app-modal').find('.modal-body').first();
+        if ($scroller.length) {
+            $scroller.animate({ scrollTop: Math.max(0, $scroller.scrollTop() + $first.offset().top - $scroller.offset().top - 80) }, 250);
+        } else {
+            $('html, body').animate({ scrollTop: Math.max(0, $first.offset().top - 140) }, 250);
+        }
     }
 
     function errorSummary(errors) {
@@ -142,9 +150,14 @@
                     AppAlert.notice(res.status, res.message);
                     return;
                 }
+                // Form di dalam modal: tutup modal lalu segarkan halaman aktif (tetap di halaman yang sama)
+                var inModal = window.AppModal && AppModal.contains(form);
+                if (inModal) AppModal.close();
                 AppAlert.success(res && res.message ? res.message : 'Data berhasil disimpan.').then(function () {
                     var next = function () {
-                        if (res && res.redirect) {
+                        if (inModal) {
+                            if (window.AppNav) AppNav.reload(); else location.reload();
+                        } else if (res && res.redirect) {
                             window.AppNav ? AppNav.visit(res.redirect) : (location.href = res.redirect);
                         } else if (window.AppNav) {
                             AppNav.reload();

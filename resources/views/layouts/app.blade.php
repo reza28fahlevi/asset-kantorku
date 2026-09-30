@@ -63,8 +63,9 @@
 <head>
     @include('layouts.partials.head')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    {{-- ajax-form sebelum ajax-nav: handler submit form [data-ajax-form] harus terpasang lebih dulu --}}
-    <script src="{{ asset('js/ajax-form.js') }}?v=2"></script>
+    {{-- ajax-form & ajax-modal sebelum ajax-nav: handler submit form [data-ajax-form] dan klik [data-modal] harus terpasang lebih dulu --}}
+    <script src="{{ asset('js/ajax-form.js') }}?v=3"></script>
+    <script src="{{ asset('js/ajax-modal.js') }}?v=1"></script>
     <script src="{{ asset('js/ajax-nav.js') }}?v=4"></script>
     @stack('head')
     {{-- Terapkan status sidebar tersembunyi sebelum Alpine aktif agar tidak berkedip saat halaman dimuat --}}
@@ -73,6 +74,9 @@
         #app-sidebar { transform: translateX(-100%); transition: transform .3s ease; }
         #app-sidebar.is-open { transform: none; }
         #app-content { transition: padding-left .3s ease; }
+        /* Form di dalam modal: isi .modal-body bisa di-scroll, .modal-footer tetap terlihat */
+        #app-modal .modal-body { overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+        #app-modal .modal-footer { flex-shrink: 0; }
         @media (min-width: 1024px) {
             #app-sidebar { transform: none; }
             #app-content { padding-left: 16rem; }

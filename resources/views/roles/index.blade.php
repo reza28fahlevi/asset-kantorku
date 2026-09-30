@@ -10,7 +10,7 @@
 @endsection
 
 @section('actions')
-    <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">
+    <a href="{{ route('admin.roles.create') }}" class="btn btn-primary" data-modal data-modal-size="xl">
         <span class="material-symbols-outlined !text-[18px]">add</span> Tambah Role
     </a>
 @endsection
@@ -33,7 +33,7 @@
                             <td class="text-right">{{ $role->permissions_count }}</td>
                             <td>@if ($role->is_system)<x-badge color="pending">Bawaan Sistem</x-badge>@else<x-badge color="neutral">Kustom</x-badge>@endif</td>
                             <td class="text-right whitespace-nowrap">
-                                <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-ghost btn-sm">Ubah</a>
+                                <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-ghost btn-sm" data-modal data-modal-title="Ubah Role" data-modal-size="xl">Ubah</a>
                                 @if (! $role->is_system && $role->users_count === 0)
                                     <form method="POST" action="{{ route('admin.roles.destroy', $role) }}" class="inline" data-ajax-form
                                           data-confirm="Hapus role {{ $role->display_name }}?" data-confirm-text="Role yang dihapus tidak dapat dikembalikan." data-confirm-button="Ya, hapus">

@@ -11,7 +11,7 @@
 
 @section('actions')
     @permission('employee.manage')
-        <a href="{{ route('masters.employees.edit', $employee) }}" class="btn btn-secondary">
+        <a href="{{ route('masters.employees.edit', $employee) }}" class="btn btn-secondary" data-modal data-modal-title="Ubah Karyawan" data-modal-size="lg">
             <span class="material-symbols-outlined !text-[18px]">edit</span> Ubah
         </a>
     @endpermission
@@ -123,12 +123,12 @@
                     <dt>Login Terakhir</dt><dd>{{ $employee->user->last_login_at?->format('d M Y H:i') ?? '-' }}</dd>
                 </dl>
                 @permission('user.manage')
-                    <a href="{{ route('admin.users.edit', $employee->user) }}" class="btn btn-secondary btn-sm w-full mt-space-md">Kelola Akun</a>
+                    <a href="{{ route('admin.users.edit', $employee->user) }}" class="btn btn-secondary btn-sm w-full mt-space-md" data-modal data-modal-title="Ubah Pengguna" data-modal-size="lg">Kelola Akun</a>
                 @endpermission
             @else
                 <p class="text-body-sm text-on-surface-variant">Karyawan ini belum memiliki akun login.</p>
                 @permission('user.manage')
-                    <a href="{{ route('admin.users.create') }}" class="btn btn-secondary btn-sm w-full mt-space-md">Buat Akun</a>
+                    <a href="{{ route('admin.users.create') }}" class="btn btn-secondary btn-sm w-full mt-space-md" data-modal data-modal-title="Tambah Pengguna" data-modal-size="lg">Buat Akun</a>
                 @endpermission
             @endif
         </x-card>

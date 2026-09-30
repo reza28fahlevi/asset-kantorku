@@ -169,4 +169,19 @@ class MasterAdminCrudTest extends TestCase
             'current_password' => 'password', 'password' => 'BaruSekali123', 'password_confirmation' => 'BaruSekali123',
         ]));
     }
+
+    public function test_simple_forms_open_in_modal(): void
+    {
+        $admin = $this->user('sysadmin');
+
+        // Halaman daftar: tombol tambah/ubah membuka modal; halaman form menandai isi modal
+        foreach (['masters.departments', 'masters.locations', 'masters.categories', 'masters.vendors', 'masters.employees', 'admin.users', 'admin.roles'] as $name) {
+            $this->actingAs($admin)->get(route("{$name}.index"))->assertOk()->assertSee('data-modal', false);
+            $this->actingAs($admin)->get(route("{$name}.create"))->assertOk()->assertSee('data-modal-content', false);
+        }
+
+        // Profil & pengaturan: form di <template> yang dibuka sebagai modal
+        $this->actingAs($admin)->get(route('profile.edit'))->assertOk()->assertSee('data-modal="#password-modal"', false);
+        $this->actingAs($admin)->get(route('admin.settings.edit'))->assertOk()->assertSee('data-modal="#settings-modal"', false);
+    }
 }

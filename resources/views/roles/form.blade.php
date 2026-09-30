@@ -16,16 +16,31 @@
 @endsection
 
 @section('content')
-{{-- data-ajax-form: simpan via AJAX, hasil ditampilkan SweetAlert, error validasi tampil per field --}}
+{{-- Dipakai sebagai halaman penuh maupun isi modal (ajax-modal.js mengambil [data-modal-content]) --}}
+<div class="card max-w-5xl">
 <form method="POST" action="{{ $editing ? route('admin.roles.update', $role) : route('admin.roles.store') }}" data-ajax-form
+      data-modal-content data-modal-title="{{ $editing ? 'Ubah Role' : 'Tambah Role' }}" data-modal-size="xl"
       x-data="{ count: {{ count($selected) }}, recount() { this.count = this.$root.querySelectorAll('input[name=\'permissions[]\']:checked').length } }"
-      @change="recount()"
-      class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+      @change="recount()">
     @csrf
     @if ($editing) @method('PUT') @endif
 
-    <div class="lg:col-span-2 space-y-gutter">
-        <x-card title="Hak Akses per Modul" icon="lock_open">
+    <div class="modal-body card-body space-y-space-lg">
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+            <x-field label="Kode Role" name="name" :required="! $role->is_system" :hint="$role->is_system ? 'Kode role bawaan sistem tidak dapat diubah.' : 'Huruf kecil, angka, garis bawah.'">
+                <input type="text" name="name" id="name" class="form-input font-mono" maxlength="50" value="{{ old('name', $role->name) }}"
+                       @if ($role->is_system) disabled @else required pattern="[a-z0-9_]+" @endif>
+            </x-field>
+            <x-field label="Nama Tampilan" name="display_name" :required="true">
+                <input type="text" name="display_name" id="display_name" class="form-input" maxlength="100" required value="{{ old('display_name', $role->display_name) }}">
+            </x-field>
+            <x-field label="Deskripsi" name="description">
+                <textarea name="description" id="description" rows="3" class="form-input" maxlength="1000">{{ old('description', $role->description) }}</textarea>
+            </x-field>
+        </section>
+
+        <section class="pt-space-md border-t border-border-subtle">
+            <h4 class="text-label-md uppercase text-outline mb-space-sm">Hak Akses per Modul</h4>
             <div class="space-y-space-lg">
                 @foreach ($permissionGroups as $group => $permissions)
                     <div x-data class="border border-border-subtle rounded">
@@ -54,33 +69,16 @@
             </div>
             @error('permissions')<p class="form-error">{{ $message }}</p>@enderror
             @error('permissions.*')<p class="form-error">{{ $message }}</p>@enderror
-        </x-card>
+        </section>
     </div>
 
-    <div>
-        <div class="card lg:sticky lg:top-space-lg">
-            <div class="card-header"><h3 class="card-title">Informasi Role</h3></div>
-            <div class="card-body space-y-space-md">
-                <x-field label="Kode Role" name="name" :required="! $role->is_system" :hint="$role->is_system ? 'Kode role bawaan sistem tidak dapat diubah.' : 'Huruf kecil, angka, garis bawah.'">
-                    <input type="text" name="name" id="name" class="form-input font-mono" maxlength="50" value="{{ old('name', $role->name) }}"
-                           @if ($role->is_system) disabled @else required pattern="[a-z0-9_]+" @endif>
-                </x-field>
-                <x-field label="Nama Tampilan" name="display_name" :required="true">
-                    <input type="text" name="display_name" id="display_name" class="form-input" maxlength="100" required value="{{ old('display_name', $role->display_name) }}">
-                </x-field>
-                <x-field label="Deskripsi" name="description">
-                    <textarea name="description" id="description" rows="3" class="form-input" maxlength="1000">{{ old('description', $role->description) }}</textarea>
-                </x-field>
-                <div class="flex items-center justify-between text-body-sm p-space-sm bg-surface rounded border border-border-subtle">
-                    <span class="text-on-surface-variant">Permission dipilih</span>
-                    <span class="font-semibold text-on-surface" x-text="count"></span>
-                </div>
-                <div class="flex flex-col gap-space-sm pt-space-sm border-t border-border-subtle">
-                    <button class="btn btn-primary w-full"><span class="material-symbols-outlined !text-[18px]">save</span> Simpan</button>
-                    <a href="{{ route('admin.roles.index') }}" class="btn btn-ghost w-full">Batal</a>
-                </div>
-            </div>
+    <div class="modal-footer flex items-center justify-between gap-space-sm px-space-lg py-space-md border-t border-border-subtle">
+        <span class="text-body-sm text-on-surface-variant">Permission dipilih: <span class="font-semibold text-on-surface" x-text="count">{{ count($selected) }}</span></span>
+        <div class="flex items-center gap-space-sm">
+            <a href="{{ route('admin.roles.index') }}" class="btn btn-ghost" data-modal-close>Batal</a>
+            <button class="btn btn-primary"><span class="material-symbols-outlined !text-[18px]">save</span> Simpan</button>
         </div>
     </div>
 </form>
+</div>
 @endsection

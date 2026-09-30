@@ -11,13 +11,16 @@
 @endsection
 
 @section('content')
+{{-- Dipakai sebagai halaman penuh maupun isi modal (ajax-modal.js mengambil [data-modal-content]) --}}
+<div class="card max-w-4xl">
 <form method="POST" data-ajax-form action="{{ $editing ? route('masters.employees.update', $employee) : route('masters.employees.store') }}"
-      class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+      data-modal-content data-modal-title="{{ $editing ? 'Ubah Karyawan' : 'Tambah Karyawan' }}" data-modal-size="lg">
     @csrf
     @if ($editing) @method('PUT') @endif
 
-    <div class="lg:col-span-2 space-y-gutter">
-        <x-card title="Identitas" icon="badge">
+    <div class="modal-body card-body space-y-space-lg">
+        <section>
+            <h4 class="text-label-md uppercase text-outline mb-space-sm">Identitas</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                 <x-field label="NIK / No. Karyawan" name="employee_no" :required="true">
                     <input type="text" name="employee_no" id="employee_no" class="form-input" maxlength="30" required value="{{ old('employee_no', $employee->employee_no) }}">
@@ -32,9 +35,10 @@
                     <input type="text" name="phone" id="phone" class="form-input" maxlength="30" value="{{ old('phone', $employee->phone) }}">
                 </x-field>
             </div>
-        </x-card>
+        </section>
 
-        <x-card title="Organisasi" icon="account_tree">
+        <section class="pt-space-md border-t border-border-subtle">
+            <h4 class="text-label-md uppercase text-outline mb-space-sm">Organisasi</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                 <x-field label="Departemen" name="department_id" :required="true">
                     <select name="department_id" id="department_id" class="form-input" required>
@@ -64,13 +68,11 @@
                     </select>
                 </x-field>
             </div>
-        </x-card>
-    </div>
+        </section>
 
-    <div>
-        <div class="card lg:sticky lg:top-space-lg">
-            <div class="card-header"><h3 class="card-title">Status Kepegawaian</h3></div>
-            <div class="card-body space-y-space-md">
+        <section class="pt-space-md border-t border-border-subtle">
+            <h4 class="text-label-md uppercase text-outline mb-space-sm">Status Kepegawaian</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
                 <x-field label="Status" name="employment_status" :required="true">
                     <select name="employment_status" id="employment_status" class="form-input" required>
                         @foreach (\App\Enums\EmploymentStatus::cases() as $s)
@@ -84,12 +86,14 @@
                 <x-field label="Tanggal Berakhir" name="end_date">
                     <input type="date" name="end_date" id="end_date" class="form-input" value="{{ old('end_date', $employee->end_date?->format('Y-m-d')) }}">
                 </x-field>
-                <div class="flex flex-col gap-space-sm pt-space-sm border-t border-border-subtle">
-                    <button class="btn btn-primary w-full"><span class="material-symbols-outlined !text-[18px]">save</span> Simpan</button>
-                    <a href="{{ $editing ? route('masters.employees.show', $employee) : route('masters.employees.index') }}" class="btn btn-ghost w-full">Batal</a>
-                </div>
             </div>
-        </div>
+        </section>
+    </div>
+
+    <div class="modal-footer flex items-center justify-end gap-space-sm px-space-lg py-space-md border-t border-border-subtle">
+        <a href="{{ $editing ? route('masters.employees.show', $employee) : route('masters.employees.index') }}" class="btn btn-ghost" data-modal-close>Batal</a>
+        <button class="btn btn-primary"><span class="material-symbols-outlined !text-[18px]">save</span> Simpan</button>
     </div>
 </form>
+</div>
 @endsection

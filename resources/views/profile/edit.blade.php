@@ -46,6 +46,77 @@
     </div>
 
     <div>
+        <x-card title="Keamanan" icon="lock" class="lg:sticky lg:top-space-lg">
+            <p class="text-body-sm text-on-surface-variant mb-space-md">Ganti password secara berkala dan jangan bagikan ke orang lain.</p>
+            <button type="button" class="btn btn-primary w-full" data-modal="#password-modal">
+                <span class="material-symbols-outlined !text-[18px]">key</span> Ubah Password
+            </button>
+        </x-card>
+    </div>
+</div>
+
+<template id="password-modal">
+    <form method="POST" data-ajax-form action="{{ route('profile.password') }}" data-modal-content data-modal-title="Ubah Password" data-modal-size="sm">
+        @csrf
+        @method('PUT')
+        <div class="modal-body card-body space-y-space-md">
+            <x-field label="Password Saat Ini" name="current_password" :required="true">
+                <input type="password" id="current_password" name="current_password" class="form-input w-full" autocomplete="current-password" required>
+            </x-field>
+            <x-field label="Password Baru" name="password" :required="true" hint="Minimal 8 karakter, mengandung huruf dan angka.">
+                <input type="password" id="password" name="password" class="form-input w-full" autocomplete="new-password" required>
+            </x-field>
+            <x-field label="Konfirmasi Password Baru" name="password_confirmation" :required="true">
+                <input type="password" id="password_confirmation" name="password_confirmation" class="form-input w-full" autocomplete="new-password" required>
+            </x-field>
+        </div>
+        <div class="modal-footer flex items-center justify-end gap-space-sm px-space-lg py-space-md border-t border-border-subtle">
+            <button type="button" class="btn btn-ghost" data-modal-close>Batal</button>
+            <button type="submit" class="btn btn-primary"><span class="material-symbols-outlined !text-[18px]">save</span> Simpan Password</button>
+        </div>
+    </form>
+</template>
+@endsection
+
+@section('content')
+@php $emp = $user->employee; @endphp
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+    <div class="lg:col-span-2 space-y-gutter">
+        <x-card title="Informasi Akun" icon="person">
+            <dl class="dl-grid">
+                <div><dt>Nama</dt><dd>{{ $user->name }}</dd></div>
+                <div><dt>Email</dt><dd>{{ $user->email }}</dd></div>
+                <div><dt>Status</dt><dd>@if ($user->is_active)<x-badge color="available">Aktif</x-badge>@else<x-badge color="neutral">Nonaktif</x-badge>@endif</dd></div>
+                <div><dt>Login Terakhir</dt><dd>{{ $user->last_login_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                <div class="sm:col-span-2"><dt>Peran</dt>
+                    <dd class="flex flex-wrap gap-space-xs mt-1">
+                        @forelse ($user->roles as $role)
+                            <x-badge color="assigned">{{ $role->display_name }}</x-badge>
+                        @empty
+                            -
+                        @endforelse
+                    </dd>
+                </div>
+            </dl>
+        </x-card>
+
+        <x-card title="Data Karyawan" icon="badge">
+            @if ($emp)
+                <dl class="dl-grid">
+                    <div><dt>No. Karyawan</dt><dd class="tag">{{ $emp->employee_no }}</dd></div>
+                    <div><dt>Jabatan</dt><dd>{{ $emp->job_title ?? '-' }}</dd></div>
+                    <div><dt>Departemen</dt><dd>{{ $emp->department?->name ?? '-' }}</dd></div>
+                    <div><dt>Atasan</dt><dd>{{ $emp->manager?->name ?? '-' }}</dd></div>
+                    <div><dt>Telepon</dt><dd>{{ $emp->phone ?? '-' }}</dd></div>
+                    <div><dt>Tanggal Bergabung</dt><dd>{{ $emp->start_date ? \Illuminate\Support\Carbon::parse($emp->start_date)->format('d M Y') : '-' }}</dd></div>
+                </dl>
+            @else
+                <x-empty icon="person_off" message="Akun ini belum terhubung dengan data karyawan." />
+            @endif
+        </x-card>
+    </div>
+
+    <div>
         <x-card title="Ubah Password" icon="lock" class="lg:sticky lg:top-space-lg">
             <form method="POST" data-ajax-form action="{{ route('profile.password') }}" class="space-y-space-md">
                 @csrf

@@ -10,7 +10,7 @@
 @endsection
 
 @section('actions')
-    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+    <a href="{{ route('admin.users.create') }}" class="btn btn-primary" data-modal data-modal-size="lg">
         <span class="material-symbols-outlined !text-[18px]">person_add</span> Tambah Pengguna
     </a>
 @endsection
@@ -71,7 +71,7 @@
                             <td>
                                 @if ($u->is_active)<x-badge color="available">Aktif</x-badge>@else<x-badge color="neutral">Nonaktif</x-badge>@endif
                             </td>
-                            <td class="text-right"><a href="{{ route('admin.users.edit', $u) }}" class="btn btn-ghost btn-sm">Ubah</a></td>
+                            <td class="text-right"><a href="{{ route('admin.users.edit', $u) }}" class="btn btn-ghost btn-sm" data-modal data-modal-title="Ubah Pengguna" data-modal-size="lg">Ubah</a></td>
                         </tr>
                     @endforeach
                 </tbody>

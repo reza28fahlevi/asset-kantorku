@@ -17,13 +17,16 @@
 @endsection
 
 @section('content')
+{{-- Dipakai sebagai halaman penuh maupun isi modal (ajax-modal.js mengambil [data-modal-content]) --}}
+<div class="card max-w-4xl">
 <form method="POST" data-ajax-form action="{{ $editing ? route('admin.users.update', $user) : route('admin.users.store') }}"
-      class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+      data-modal-content data-modal-title="{{ $editing ? 'Ubah Pengguna' : 'Tambah Pengguna' }}" data-modal-size="lg">
     @csrf
     @if ($editing) @method('PUT') @endif
 
-    <div class="lg:col-span-2 space-y-gutter">
-        <x-card title="Akun" icon="account_circle">
+    <div class="modal-body card-body space-y-space-lg">
+        <section>
+            <h4 class="text-label-md uppercase text-outline mb-space-sm">Akun</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                 <x-field label="Nama" name="name" :required="true">
                     <input type="text" name="name" id="name" class="form-input" maxlength="150" required value="{{ old('name', $user->name) }}">
@@ -40,9 +43,22 @@
                     </select>
                 </x-field>
             </div>
-        </x-card>
+            <label class="flex items-start gap-2 mt-space-md">
+                <input type="checkbox" name="is_active" value="1" class="rounded border-border-subtle mt-1" @checked($isActive)>
+                <span>
+                    <span class="text-body-md font-semibold text-on-surface">Akun aktif</span>
+                    <span class="block text-body-sm text-on-surface-variant">Akun nonaktif tidak dapat login.</span>
+                </span>
+            </label>
+            @if ($editing)
+                <p class="mt-space-sm text-body-sm text-on-surface-variant">
+                    Login terakhir: {{ $user->last_login_at?->format('d M Y H:i') ?? '-' }} · Dibuat: {{ $user->created_at?->format('d M Y') }}
+                </p>
+            @endif
+        </section>
 
-        <x-card title="Kata Sandi" icon="key">
+        <section class="pt-space-md border-t border-border-subtle">
+            <h4 class="text-label-md uppercase text-outline mb-space-sm">Kata Sandi</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                 <x-field label="Kata Sandi" name="password" :required="! $editing" :hint="$editing ? 'Kosongkan jika tidak ingin mengubah.' : 'Minimal 8 karakter, kombinasi huruf dan angka.'">
                     <input type="password" name="password" id="password" class="form-input" autocomplete="new-password" @if (! $editing) required @endif>
@@ -51,12 +67,13 @@
                     <input type="password" name="password_confirmation" id="password_confirmation" class="form-input" autocomplete="new-password">
                 </x-field>
             </div>
-        </x-card>
+        </section>
 
         @php
             $rolePermissions = $roles->mapWithKeys(fn ($r) => [$r->id => $r->permissions->map(fn ($p) => ['id' => $p->id, 'label' => $p->display_name ?: $p->name, 'group' => $p->group_name ?: 'Umum'])->values()]);
         @endphp
-        <x-card title="Role Akses (Multi Role)" icon="shield_person">
+        <section class="pt-space-md border-t border-border-subtle">
+            <h4 class="text-label-md uppercase text-outline mb-space-sm">Role Akses (Multi Role)</h4>
             <div x-data="rolePicker(@js($selectedRoles), @js($rolePermissions))">
             <p class="text-body-sm text-on-surface-variant mb-space-md">Pilih satu atau lebih role. Hak akses user adalah gabungan dari seluruh role yang dipilih.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
@@ -95,52 +112,32 @@
             @error('roles')<p class="form-error">{{ $message }}</p>@enderror
             @error('roles.*')<p class="form-error">{{ $message }}</p>@enderror
             </div>
-        </x-card>
+        </section>
     </div>
 
-    <div>
-        <div class="card lg:sticky lg:top-space-lg">
-            <div class="card-header"><h3 class="card-title">Status Akun</h3></div>
-            <div class="card-body space-y-space-md">
-                <label class="flex items-start gap-2">
-                    <input type="checkbox" name="is_active" value="1" class="rounded border-border-subtle mt-1" @checked($isActive)>
-                    <span>
-                        <span class="text-body-md font-semibold text-on-surface">Akun aktif</span>
-                        <span class="block text-body-sm text-on-surface-variant">Akun nonaktif tidak dapat login.</span>
-                    </span>
-                </label>
-                @if ($editing)
-                    <dl class="dl-grid">
-                        <dt>Login Terakhir</dt><dd>{{ $user->last_login_at?->format('d M Y H:i') ?? '-' }}</dd>
-                        <dt>Dibuat</dt><dd>{{ $user->created_at?->format('d M Y') }}</dd>
-                    </dl>
-                @endif
-                <div class="flex flex-col gap-space-sm pt-space-sm border-t border-border-subtle">
-                    <button class="btn btn-primary w-full"><span class="material-symbols-outlined !text-[18px]">save</span> Simpan</button>
-                    <a href="{{ route('admin.users.index') }}" class="btn btn-ghost w-full">Batal</a>
-                </div>
-            </div>
-        </div>
+    <div class="modal-footer flex items-center justify-end gap-space-sm px-space-lg py-space-md border-t border-border-subtle">
+        <a href="{{ route('admin.users.index') }}" class="btn btn-ghost" data-modal-close>Batal</a>
+        <button class="btn btn-primary"><span class="material-symbols-outlined !text-[18px]">save</span> Simpan</button>
     </div>
+
+    {{-- Script di dalam form agar ikut dijalankan saat form dimuat ke modal --}}
+    <script>
+        function rolePicker(selected, rolePermissions) {
+            return {
+                selected: selected,
+                effective() {
+                    const map = new Map();
+                    this.selected.forEach(id => (rolePermissions[id] || []).forEach(p => map.set(p.id, p)));
+                    return [...map.values()];
+                },
+                grouped() {
+                    const groups = {};
+                    this.effective().forEach(p => (groups[p.group] ??= []).push(p));
+                    return Object.entries(groups).sort();
+                },
+            };
+        }
+    </script>
 </form>
+</div>
 @endsection
-
-@push('scripts')
-<script>
-    function rolePicker(selected, rolePermissions) {
-        return {
-            selected: selected,
-            effective() {
-                const map = new Map();
-                this.selected.forEach(id => (rolePermissions[id] || []).forEach(p => map.set(p.id, p)));
-                return [...map.values()];
-            },
-            grouped() {
-                const groups = {};
-                this.effective().forEach(p => (groups[p.group] ??= []).push(p));
-                return Object.entries(groups).sort();
-            },
-        };
-    }
-</script>
-@endpush

@@ -11,7 +11,7 @@
 
 @section('actions')
     @permission('employee.manage')
-        <a href="{{ route('masters.employees.create') }}" class="btn btn-primary">
+        <a href="{{ route('masters.employees.create') }}" class="btn btn-primary" data-modal data-modal-size="lg">
             <span class="material-symbols-outlined !text-[18px]">person_add</span> Tambah Karyawan
         </a>
     @endpermission
@@ -87,7 +87,7 @@
                             <td class="text-right whitespace-nowrap">
                                 <a href="{{ route('masters.employees.show', $e) }}" class="btn btn-ghost btn-sm">Detail</a>
                                 @permission('employee.manage')
-                                    <a href="{{ route('masters.employees.edit', $e) }}" class="btn btn-ghost btn-sm">Ubah</a>
+                                    <a href="{{ route('masters.employees.edit', $e) }}" class="btn btn-ghost btn-sm" data-modal data-modal-title="Ubah Karyawan" data-modal-size="lg">Ubah</a>
                                 @endpermission
                             </td>
                         </tr>

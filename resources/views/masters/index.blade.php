@@ -16,7 +16,7 @@
 
 @section('actions')
     @if ($canManage)
-        <a href="{{ route("masters.{$key}.create") }}" class="btn btn-primary">
+        <a href="{{ route("masters.{$key}.create") }}" class="btn btn-primary" data-modal>
             <span class="material-symbols-outlined !text-[18px]">add</span> Tambah {{ $title }}
         </a>
     @endif
@@ -82,7 +82,7 @@
                             </td>
                             @if ($canManage)
                                 <td class="text-right whitespace-nowrap">
-                                    <a href="{{ route("masters.{$key}.edit", $item->getKey()) }}" class="btn btn-ghost btn-sm">Ubah</a>
+                                    <a href="{{ route("masters.{$key}.edit", $item->getKey()) }}" class="btn btn-ghost btn-sm" data-modal data-modal-title="Ubah {{ $title }}">Ubah</a>
                                     <x-confirm-form :action="route('masters.'.$key.'.destroy', $item->getKey())" method="DELETE"
                                                     confirm="Hapus {{ $item->name }}? Data yang sudah dipakai tidak dapat dihapus." button="btn btn-ghost btn-sm text-error">
                                         Hapus
