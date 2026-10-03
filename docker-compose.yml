@@ -1,0 +1,38 @@
+# Deploy: cp .env.docker.example .env  →  isi DB_PASSWORD & APP_URL  →  docker compose up -d --build
+services:
+  app:
+    build: .
+    image: asset-kantorku:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+    ports:
+      - "${APP_PORT:-80}:80"
+    volumes:
+      - storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-asset_kantorku}
+      POSTGRES_USER: ${DB_USERNAME:-assetkantorku}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Isi DB_PASSWORD di file .env}
+      TZ: Asia/Jakarta
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  storage:
+  pgdata:
